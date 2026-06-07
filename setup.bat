@@ -6,6 +6,7 @@ set "AGENTS_TARGET=%REPO_DIR%agents"
 
 :: Determine the opencode global agents directory on Windows
 set "OPENCODE_AGENTS_DIR=%LOCALAPPDATA%\opencode\agents"
+if not exist "%LOCALAPPDATA%\opencode" mkdir "%LOCALAPPDATA%\opencode"
 
 :: Remove existing agents directory/junction if it exists
 if exist "%OPENCODE_AGENTS_DIR%" (
