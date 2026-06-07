@@ -41,7 +41,7 @@ git clone https://github.com/UgochukwuChidera/Opencode-Agents.git $HOME\code\Ope
 
 The `agents/` folder is the single source of truth. On Linux, a symlink points
 `~/.config/opencode/agents/` to it. On Windows, a directory junction points
-`%LOCALAPPDATA%\opencode\agents\` to it.
+`%USERPROFILE%\.config\opencode\agents\` to it.
 
 Edit agent files here, commit, push, and pull on the other machine — opencode
 sees the changes instantly.
