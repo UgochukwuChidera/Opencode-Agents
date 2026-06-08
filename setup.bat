@@ -3,22 +3,35 @@ setlocal enabledelayedexpansion
 
 set "REPO_DIR=%~dp0"
 set "AGENTS_TARGET=%REPO_DIR%agents"
+set "TOOLS_TARGET=%REPO_DIR%tools"
+set "OPENCODE_AGENTS_DIR=%LOCALAPPDATA%\opencode\agents"
+set "OPENCODE_TOOLS_DIR=%LOCALAPPDATA%\opencode\tools"
 
-:: Determine the opencode global agents directory on Windows
-set "OPENCODE_AGENTS_DIR=%USERPROFILE%\.config\opencode\agents"
-if not exist "%USERPROFILE%\.config\opencode" mkdir "%USERPROFILE%\.config\opencode"
-
-:: Remove existing agents directory/junction if it exists
+:: ── Agents junction ────────────────────────────────────────────────
 if exist "%OPENCODE_AGENTS_DIR%" (
   echo Removing existing: %OPENCODE_AGENTS_DIR%
   rmdir /s /q "%OPENCODE_AGENTS_DIR%"
 )
-
-:: Create the directory junction
 echo Creating junction: %OPENCODE_AGENTS_DIR% -^> %AGENTS_TARGET%
 mklink /J "%OPENCODE_AGENTS_DIR%" "%AGENTS_TARGET%"
+echo   Agents linked.
 
-echo Done! opencode agents are now linked to: %AGENTS_TARGET%
-dir "%OPENCODE_AGENTS_DIR%"
+:: ── Tools junction ─────────────────────────────────────────────────
+if exist "%OPENCODE_TOOLS_DIR%" (
+  echo Removing existing: %OPENCODE_TOOLS_DIR%
+  rmdir /s /q "%OPENCODE_TOOLS_DIR%"
+)
+echo Creating junction: %OPENCODE_TOOLS_DIR% -^> %TOOLS_TARGET%
+mklink /J "%OPENCODE_TOOLS_DIR%" "%TOOLS_TARGET%"
+echo   Tools linked.
+
+echo.
+echo Done! opencode agents and tools are linked.
+echo   Agents: %AGENTS_TARGET%
+echo   Tools:  %TOOLS_TARGET%
+echo.
+echo IMPORTANT: Make sure your opencode.jsonc has the plugin entry:
+echo   "plugin": ["./tools/index.mjs"]
+echo.
 
 pause
