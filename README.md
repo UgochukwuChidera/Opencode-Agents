@@ -89,7 +89,7 @@ git clone https://github.com/UgochukwuChidera/Opencode-Agents.git $HOME\code\Ope
 ### Manual Plugin Registration
 
 After running setup, add this to `~/.config/opencode/opencode.jsonc` (Linux/macOS) or
-`%LOCALAPPDATA%\opencode\opencode.jsonc` (Windows):
+`%USERPROFILE%\.config\opencode\opencode.jsonc` (Windows):
 
 ```jsonc
 {
@@ -105,11 +105,11 @@ appear in the LLM context.
 
 - **`agents/`** folder is the single source of truth for agent definitions.
   - On Linux: symlinked to `~/.config/opencode/agents/`
-  - On Windows: directory junction to `%LOCALAPPDATA%\opencode\agents\`
+  - On Windows: directory junction to `%USERPROFILE%\.config\opencode\agents\`
 
 - **`tools/`** folder contains plugin modules that register additional tools.
   - On Linux: symlinked to `~/.config/opencode/tools/`
-  - On Windows: directory junction to `%LOCALAPPDATA%\opencode\tools\`
+  - On Windows: directory junction to `%USERPROFILE%\.config\opencode\tools\`
   - Registered via `plugin` field in `opencode.jsonc`
 
 Edit files here, commit, push, and pull on other machines — opencode sees changes instantly.
