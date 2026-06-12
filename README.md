@@ -1,12 +1,12 @@
-# Opencode Agents & Tools
+# Opencode Agents, Tools & Skills
 
-Custom agent definitions and tools for [opencode](https://opencode.ai/), synchronized across Linux and Windows via symlinks/junctions.
+Custom agent definitions, tool plugins, and skill instructions for [opencode](https://opencode.ai/), synchronized across Linux and Windows via symlinks/junctions.
 
 ## Structure
 
 ```
 Opencode-Agents/
-├── agents/         # 13 agent personality definitions (markdown)
+├── agents/         # 14 agent personality definitions (markdown)
 ├── tools/          # Custom tool plugins (ESM modules)
 │   ├── index.mjs   # Main plugin aggregator (register this in opencode.jsonc)
 │   ├── bash-tool.mjs      # Cross-platform shell execution
@@ -18,7 +18,13 @@ Opencode-Agents/
 │   ├── net-tools.mjs      # DNS lookup, port check, HTTP health check
 │   ├── windows-tools.mjs  # Path conversion, env vars, Windows info
 │   ├── custom-tools.mjs   # Template for your own tools
-│   └── ...
+│   └── bash-mcp.mjs       # Bash MCP server for isolated shell execution
+├── skills/         # Skill instructions auto-loaded by opencode
+│   ├── react-patterns/SKILL.md      # React component & hooks patterns
+│   ├── error-handling/SKILL.md      # Error handling across languages
+│   ├── api-design/SKILL.md          # REST & GraphQL API design
+│   ├── testing-strategy/SKILL.md    # Test pyramid, mocking, coverage
+│   └── security-review/SKILL.md     # OWASP, auth, secrets, vulns
 ├── setup.sh        # Linux/macOS setup script
 ├── setup.bat       # Windows setup script
 └── README.md       # This file
@@ -40,7 +46,24 @@ Opencode-Agents/
 | **debugger** | `subagent` | Investigates runtime errors and test failures |
 | **test-writer** | `subagent` | Writes tests covering edge cases and regressions |
 | **commit-crafter** | `subagent` | Stages files and writes conventional commits |
+| **git-wrangler** | `subagent` | Handles full git workflows — stash, pull, branch, merge, rebase, resolve conflicts, push |
 | **dependency-auditor** | `subagent` | Audits dependencies for updates and vulnerabilities |
+
+## Skills
+
+Skills are specialized Markdown instruction files that get loaded into the LLM's context when a task matches their trigger keywords. They provide deep, structured guidance on specific domains.
+
+Each skill auto-registers with opencode via its `name` and `description` frontmatter. When a relevant task appears, the model loads the skill automatically — no manual invocation needed.
+
+| Skill | Description | Complements |
+|-------|-------------|-------------|
+| **react-patterns** | React component composition, hooks patterns, state management (Context vs Redux vs Zustand), performance optimization (memoization), custom hooks, compound components, error boundaries, a11y | `creator`, `executor` |
+| **error-handling** | Go/Rust/TS/Python error patterns, structured logging, user-facing vs internal errors, retry strategies (exponential backoff, circuit breaker), panic recovery, database error handling | `debugger`, `historian` |
+| **api-design** | RESTful URL conventions, HTTP methods & status codes, request/response shapes, pagination strategies (cursor vs offset), idempotency, rate limiting, auth patterns, GraphQL schema design, OpenAPI docs | `soul`, `oracle`, `design` |
+| **testing-strategy** | Test pyramid ratios, what to test vs skip, file placement & naming, AAA pattern, mocking rules, coverage targets, flaky test management, property-based testing, CI integration | `test-writer`, `reviewer` |
+| **security-review** | OWASP Top 10 quick reference, web app security checklist (auth, authorization, input validation, output encoding, headers), API security (CORS, rate limiting), dependency scanning, secure defaults, code review questions | `reviewer`, `historian` |
+
+> Skills are auto-discovered at startup — no config changes needed. Just restart opencode after adding new ones.
 
 ## Tools
 
@@ -112,6 +135,11 @@ appear in the LLM context.
   - On Windows: directory junction to `%USERPROFILE%\.config\opencode\tools\`
   - Registered via `plugin` field in `opencode.jsonc`
 
+- **`skills/`** folder contains skill instruction files that are auto-discovered.
+  - On Linux: symlinked to `~/.config/opencode/skills/`
+  - On Windows: directory junction to `%USERPROFILE%\.config\opencode\skills\`
+  - Auto-discovered on startup — no config entry needed
+
 Edit files here, commit, push, and pull on other machines — opencode sees changes instantly.
 
 ## Creating Custom Tools
@@ -148,12 +176,37 @@ const toolDefinitions = {
 };
 ```
 
+## Creating Custom Skills
+
+Skills follow a simple Markdown format. To add your own skill:
+
+1. Create a new folder in `skills/` (name must match the skill name)
+2. Create a `SKILL.md` file inside it with frontmatter
+3. Restart opencode — the skill is auto-discovered
+
+```markdown
+---
+name: my-skill
+description: Use when the user asks about X or mentions Y. Provides step-by-step guidance for doing Z.
+---
+
+# My Skill
+
+Detailed instructions, examples, code snippets, and conventions here.
+```
+
+Rules:
+- `name` is required, lowercase hyphen-separated, and must match the folder name
+- `description` is required — front-load trigger keywords so the model loads it at the right time
+- The file **must** be named `SKILL.md` exactly
+- No config registration needed — opencode scans `skills/` recursively at startup
+
 ## Sync Workflow
 
 ```bash
-# After editing an agent or tool
+# After editing an agent, tool, or skill
 cd ~/code/Opencode-Agents
-git add agents/<name>.md tools/<name>.mjs
+git add agents/<name>.md tools/<name>.mjs skills/<name>/SKILL.md
 git commit -m "Update <name>"
 git push
 
