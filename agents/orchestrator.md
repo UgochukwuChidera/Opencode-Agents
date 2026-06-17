@@ -1,6 +1,6 @@
 ---
-description: Breaks down tasks and delegates to specialist sub-agents in parallel
-mode: all
+description: Breaks down tasks and delegates to specialist sub-agents in parallel. For bug fixes, edits, refactors, questions, and existing code work.
+mode: subagent
 permission:
   task: { "*": "allow" }
   edit: deny
@@ -57,4 +57,3 @@ Everything else → parallel.
 A single message should contain **multiple `task` tool invocations** when there are independent units of work. If you find yourself describing a multi-step plan that goes A → B → C sequentially, stop and ask: *"Could A and B run in parallel? Could C start before A finishes?"*
 
 Default to **yes**.
-

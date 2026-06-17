@@ -58,6 +58,9 @@ import {
 // Import and add your custom tools here:
 // import { myTool } from "./custom-tools.mjs";
 
+// Meta-Architect plan execution
+import { planExecutorTool } from "./plan-executor.mjs";
+
 /**
  * Collect all tool definitions here.
  * Each key becomes the tool name visible to agents.
@@ -99,6 +102,9 @@ const toolDefinitions = {
 
   // ─── Add your custom tools here ──────────────────────────────────
   // mytool: myTool,
+
+  // Meta-Architect plan execution
+  "plan-executor": planExecutorTool,
 };
 
 /**
