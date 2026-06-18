@@ -169,6 +169,10 @@ import {
   lotteryTool,
 } from "./math-tools.mjs";
 
+// ─── AI Detection tools (2 tools) ────────────────────────────────────
+import { aiDetectorTool } from "./ai-detector.mjs";
+import { aiSeniorTool } from "./ai-senior.mjs";
+
 /**
  * Collect all tool definitions here.
  * Each key becomes the tool name visible to agents.
@@ -304,6 +308,10 @@ const toolDefinitions = {
   dice: diceTool,
   password: passwordTool,
   lottery: lotteryTool,
+
+  // ── AI Detection (2) ──
+  "ai-detector": aiDetectorTool,
+  "ai-senior": aiSeniorTool,
 };
 
 /**
