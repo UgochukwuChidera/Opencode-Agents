@@ -2,7 +2,12 @@
 description: Breaks down tasks and delegates to specialist sub-agents in parallel. For bug fixes, edits, refactors, questions, and existing code work.
 mode: subagent
 permission:
-  task: { "*": "allow" }
+  read: allow
+  glob: allow
+  grep: allow
+  list: allow
+  task:
+    "*": "allow"
   edit: deny
   bash: deny
 ---
@@ -15,6 +20,24 @@ Before starting ANY work, ask: **"Can these sub-tasks run in parallel?"**
 
 If the answer is anything other than "no, because of a hard dependency" — run them in parallel. Use a single message with multiple `task` tool calls. Do not batch related work into one sequential agent call when it could be split.
 
+## Analysis → Plan → Build pipeline
+
+For complex features or refactors, follow this pipeline:
+
+```
+┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐
+│ Oracle   │───→│ Architect│───→│ Plan     │───→│ Design / │
+│ (deep    │    │ (turn    │    │ (step-by │    │ Executor │
+│  analysis│    │  analysis│    │  -step)  │    │ (build)  │
+│ )        │    │  into    │    │          │    │          │
+│          │    │  design) │    │          │    │          │
+└──────────┘    └──────────┘    └──────────┘    └──────────┘
+```
+
+- **Small/trivial task** → skip analysis, go direct to executor/creator
+- **Medium task** → call soul for quick synthesis, then dispatch
+- **Large/unfamiliar task** → oracle → architect → plan → dispatch
+
 ## Parallel execution patterns
 
 | Pattern | How |
@@ -26,6 +49,8 @@ If the answer is anything other than "no, because of a hard dependency" — run 
 | **Divide and conquer** | For large refactors, split by concern (types, logic, tests) and run everything at once |
 | **Multi-angle exploration** | Dispatch 3-5 explore agents in parallel to map different areas of a large codebase |
 | **Speculative parallelism** | Start working on the most likely path while explorer validates the assumption — abort if wrong |
+| **Analysis + Design** | Oracle analyzes while architect starts structuring known areas |
+| **Plan + Build** | Plan can sequence while executor builds non-dependent pieces |
 
 ## When NOT to parallelize
 
@@ -44,11 +69,12 @@ Everything else → parallel.
 | Creative implementation | `creator` | ✅ Yes |
 | Codebase research (read-only) | `explore` / `explorer` | ✅ Yes, launch 3+ |
 | Deep architecture understanding | `oracle` | ✅ Yes |
+| Architecture design & decisions | `architect` | ✅ Yes (parallel with research) |
+| Structured step-by-step planning | `plan` | ✅ Yes |
 | Project synthesis | `soul` | ✅ Yes (if on a different module) |
 | Code review / quality check | `historian` / `reviewer` | ✅ Yes, interleaved with building |
 | Test writing | `test-writer` | ✅ Yes |
 | Complex multi-step sub-tasks | `general` | ✅ Yes, with other general agents |
-| Structured planning | `plan` | ✅ Yes |
 | Creative+structured synthesis | `design` | ✅ Yes |
 | Git workflow | `git-wrangler` | Usually sequential (depends on state) |
 

@@ -1,64 +1,107 @@
 /**
  * Bash Tool - Cross-platform shell execution
  *
- * Provides a configurable shell execution tool that works on Linux, macOS, and Windows.
- * Uses Node.js child_process with proper shell detection per platform.
+ * Executes shell commands using a proper subprocess with cross-platform support.
+ * On Linux/macOS defaults to /bin/bash. On Windows uses PowerShell.
  */
 import { tool } from "@opencode-ai/plugin";
-import { exec } from "child_process";
-import { promisify } from "util";
+import { spawn } from "child_process";
 import os from "os";
 
-const execAsync = promisify(exec);
-
 /**
- * Detect the appropriate shell for the current platform.
+ * Get the shell and its arguments for the current platform.
  */
-function detectShell() {
+function getShellConfig() {
   const platform = os.platform();
   if (platform === "win32") {
-    // Use PowerShell if available, fall back to cmd.exe
-    return { shell: "powershell.exe", args: ["-NoProfile", "-Command"] };
+    return {
+      shell: "powershell.exe",
+      args: ["-NoProfile", "-Command"],
+    };
   }
-  const shell = os.userInfo().shell || "/bin/bash";
-  return { shell, args: ["-c"] };
+  // Use /bin/bash explicitly — the tool is called "bash"
+  return {
+    shell: "/bin/bash",
+    args: ["-c"],
+  };
 }
 
 /**
- * Execute a shell command with timeout and working directory support.
+ * Execute a shell command using spawn for reliable cross-shell behavior.
+ * This avoids the double -c bug that exec() has when combining shell option
+ * with manually constructed command strings.
  */
-async function executeCommand(command, options = {}) {
+export async function executeCommand(command, options = {}) {
   const { cwd, timeout = 60000, env } = options;
-  const shellInfo = detectShell();
-  const shellCmd = [...shellInfo.args, command].join(" ");
+  const { shell, args } = getShellConfig();
 
-  try {
-    const { stdout, stderr } = await execAsync(shellCmd, {
+  // Build the full args: shell args + command
+  const allArgs = [...args, command];
+
+  return new Promise((resolve) => {
+    const child = spawn(shell, allArgs, {
       cwd: cwd || process.cwd(),
-      timeout: timeout,
-      maxBuffer: 10 * 1024 * 1024, // 10MB
+      timeout,
       env: env ? { ...process.env, ...env } : process.env,
-      shell: shellInfo.shell,
       windowsHide: true,
+      stdio: ["pipe", "pipe", "pipe"],
     });
 
-    return {
-      exitCode: 0,
-      stdout: stdout || "",
-      stderr: stderr || "",
-      platform: os.platform(),
-      shell: shellInfo.shell,
-    };
-  } catch (error) {
-    return {
-      exitCode: error.code || error.status || -1,
-      stdout: error.stdout || "",
-      stderr: error.stderr || error.message || "",
-      platform: os.platform(),
-      shell: shellInfo.shell,
-      error: error.message,
-    };
-  }
+    let stdout = "";
+    let stderr = "";
+    let timedOut = false;
+
+    const timer = setTimeout(() => {
+      timedOut = true;
+      child.kill("SIGTERM");
+      // Give it a moment, then SIGKILL
+      setTimeout(() => {
+        try { child.kill("SIGKILL"); } catch {}
+      }, 2000);
+    }, timeout);
+
+    child.stdout.on("data", (data) => {
+      stdout += data.toString();
+    });
+
+    child.stderr.on("data", (data) => {
+      stderr += data.toString();
+    });
+
+    child.on("close", (code) => {
+      clearTimeout(timer);
+      if (timedOut) {
+        resolve({
+          exitCode: -1,
+          stdout,
+          stderr: stderr + "\n[ERROR: Command timed out after " + timeout + "ms]",
+          platform: os.platform(),
+          shell,
+          error: "timed_out",
+        });
+      } else {
+        resolve({
+          exitCode: code ?? -1,
+          stdout: stdout || "",
+          stderr: stderr || "",
+          platform: os.platform(),
+          shell,
+        });
+      }
+    });
+
+    child.on("error", (err) => {
+      clearTimeout(timer);
+      resolve({
+        exitCode: -1,
+        stdout: stdout || "",
+        stderr: stderr || err.message,
+        platform: os.platform(),
+        shell,
+        error: err.message,
+      });
+    });
+  });
 }
 
 /**
@@ -67,19 +110,17 @@ async function executeCommand(command, options = {}) {
  */
 export const bashTool = tool({
   description: `Execute shell commands on the local system.
-Cross-platform (Linux, macOS, Windows) with automatic shell detection.
+Cross-platform (Linux, macOS, Windows). Defaults to /bin/bash on Unix, PowerShell on Windows.
 Use for running scripts, build commands, file operations, and system tasks.
-Supports timeout, working directory, environment variables, and PowerShell on Windows.`,
+Supports timeout, working directory, and environment variables.`,
   args: {
     command: tool.schema
       .string()
-      .describe("The shell command to execute. For Windows, PowerShell syntax is used."),
+      .describe("The shell command to execute."),
     workdir: tool.schema
       .string()
       .optional()
-      .describe(
-        "Working directory for the command (default: current project directory)"
-      ),
+      .describe("Working directory for the command (default: current project directory)"),
     timeout: tool.schema
       .number()
       .optional()
@@ -135,6 +176,7 @@ Supports timeout, working directory, environment variables, and PowerShell on Wi
 /**
  * PowerShell-specific tool (Windows).
  * Only available on Windows; falls back to descriptive error on other platforms.
+ * This is a simpler alternative to the bash tool for Windows-specific tasks.
  */
 export const powershellTool = tool({
   description: `Execute PowerShell commands on Windows.
@@ -166,31 +208,37 @@ Use for Windows-specific scripting, registry access, and WMI queries.`,
     const cwd = args.workdir || context.directory;
     const timeout = Math.min(args.timeout ?? 60000, 300000);
 
-    try {
-      const { stdout, stderr } = await execAsync(args.command, {
+    return new Promise((resolve) => {
+      const child = spawn("powershell.exe", ["-NoProfile", "-Command", args.command], {
         cwd,
         timeout,
-        maxBuffer: 10 * 1024 * 1024,
-        shell: "powershell.exe",
+        env: { ...process.env },
         windowsHide: true,
+        stdio: ["pipe", "pipe", "pipe"],
       });
 
-      const output = (stdout || "") + (stderr ? `\n--- stderr ---\n${stderr}` : "");
-      return {
-        title: `powershell: ${args.command.slice(0, 80)}`,
-        output: output || "(no output)",
-        metadata: { exitCode: 0, platform: "win32" },
-      };
-    } catch (error) {
-      return {
-        title: `powershell: ${args.command.slice(0, 80)}`,
-        output: error.stderr || error.message || "Command failed",
-        metadata: {
-          exitCode: error.code || error.status || -1,
-          platform: "win32",
-          error: error.message,
-        },
-      };
-    }
+      let stdout = "";
+      let stderr = "";
+
+      child.stdout.on("data", (data) => { stdout += data.toString(); });
+      child.stderr.on("data", (data) => { stderr += data.toString(); });
+
+      child.on("close", (code) => {
+        const output = (stdout || "") + (stderr ? `\n--- stderr ---\n${stderr}` : "");
+        resolve({
+          title: `powershell: ${args.command.slice(0, 80)}`,
+          output: output || "(no output)",
+          metadata: { exitCode: code ?? -1, platform: "win32" },
+        });
+      });
+
+      child.on("error", (err) => {
+        resolve({
+          title: `powershell: ${args.command.slice(0, 80)}`,
+          output: err.message || "Command failed",
+          metadata: { exitCode: -1, platform: "win32", error: err.message },
+        });
+      });
+    });
   },
 });
