@@ -6,7 +6,7 @@ Custom agent definitions, tool plugins, and skill instructions for [opencode](ht
 
 ```
 Opencode-Agents/
-├── agents/         # 14 agent personality definitions (markdown)
+├── agents/         # 27 agent personality definitions (markdown)
 ├── tools/          # Custom tool plugins (ESM modules)
 │   ├── index.mjs           # Main plugin aggregator (register this in opencode.jsonc)
 │   ├── bash-tool.mjs       # Cross-platform shell execution
@@ -23,6 +23,9 @@ Opencode-Agents/
 │   ├── date-tools.mjs      # 9 date tools (date, cron, clock...)
 │   ├── math-tools.mjs      # 7 math tools (math, roman, dice...)
 │   ├── windows-tools.mjs   # Path conversion, env vars, Windows info
+│   ├── ai-detector.mjs     # AI-generated text detection
+│   ├── ai-senior.mjs       # Senior AI detection aggregator
+│   ├── plan-executor.mjs   # Meta-Architect plan queue extraction
 │   ├── custom-tools.mjs    # Template for your own tools
 │   └── bash-mcp.mjs        # Bash MCP server (deprecated)
 ├── skills/         # Skill instructions auto-loaded by opencode
@@ -30,7 +33,10 @@ Opencode-Agents/
 │   ├── error-handling/SKILL.md
 │   ├── api-design/SKILL.md
 │   ├── testing-strategy/SKILL.md
-│   └── security-review/SKILL.md
+│   ├── security-review/SKILL.md
+│   ├── design-system-implementation/SKILL.md
+│   ├── meta-architect-patterns/SKILL.md
+│   └── segmented-prompt-execution/SKILL.md
 ├── setup.sh        # Linux/macOS setup script
 ├── setup.bat       # Windows setup script
 └── README.md       # This file
@@ -40,6 +46,7 @@ Opencode-Agents/
 
 | Agent | Mode | Description |
 |-------|------|-------------|
+| **meta-architect-orchestrator** | `all` | Entry point for all developer requests — classifies task and delegates |
 | **orchestrator** | `all` | Breaks down complex tasks and delegates to specialist sub-agents in parallel |
 | **design** | `all` | Dynamic orchestrator of soul, creator, and historian agents |
 | **oracle** | `all` | Deep codebase understanding for large-scale architectural analysis |
@@ -49,11 +56,26 @@ Opencode-Agents/
 | **explorer** | `subagent` | Read-only codebase research |
 | **historian** | `subagent` | Critical quality guardian — catches errors, over-engineering, security holes |
 | **reviewer** | `subagent` | Reviews code for bugs, security, and best practices |
-| **debugger** | `subagent` | Investigates runtime errors and test failures |
+| **debugger** | `subagent` | Investigates runtime errors and test failures by systematic root cause analysis |
 | **test-writer** | `subagent` | Writes tests covering edge cases and regressions |
 | **commit-crafter** | `subagent` | Stages files and writes conventional commits |
 | **git-wrangler** | `subagent` | Handles full git workflows — stash, pull, branch, merge, rebase, resolve conflicts, push |
 | **dependency-auditor** | `subagent` | Audits dependencies for updates and vulnerabilities |
+| **adr-enforcer** | `subagent` | Verifies code follows Architecture Decision Records |
+| **build-plan-tracker** | `subagent` | Verifies plan.json prompts against files on disk |
+| **prompt-executor** | `subagent` | Executes a single prompt from a Meta-Architect build plan |
+| **spec-verifier** | `subagent` | Verifies implemented components match Meta-Architect specs |
+| **ui-designer** | `subagent` | Standalone UI/UX design agent — creates design systems and specs |
+| **architect** | `subagent` | Turns analysis into actionable architecture plans |
+| **meta-architect-planner** | `subagent` | Runs the 6-stage Meta-Architect planning pipeline |
+| **meta-architect-executor** | `subagent` | Executes a Meta-Architect build plan |
+| **meta-architect-stage-0** | `subagent` | Stack inference specialist |
+| **meta-architect-stage-1** | `subagent` | Clarification analyst |
+| **meta-architect-stage-2** | `subagent` | Domain modeling expert |
+| **meta-architect-stage-3** | `subagent` | Software architect |
+| **meta-architect-stage-4** | `subagent` | UI/UX designer |
+| **meta-architect-stage-5** | `subagent` | Build-prompt engineer |
+| **meta-architect-stage-6** | `subagent` | Build plan writer |
 
 ## Skills
 
@@ -66,8 +88,11 @@ Skills are specialized Markdown instruction files that get loaded into the LLM's
 | **api-design** | RESTful URL conventions, HTTP methods, pagination, OpenAPI docs |
 | **testing-strategy** | Test pyramid, mocking rules, coverage targets, CI integration |
 | **security-review** | OWASP Top 10, XSS, CSRF, auth patterns, secure defaults |
+| **design-system-implementation** | UI components from design token specs, Tailwind, 4 states rule |
+| **meta-architect-patterns** | Meta-Architect build plan execution and ADR enforcement |
+| **segmented-prompt-execution** | One-prompt-at-a-time execution from build plans |
 
-## Tools (105 total)
+## Tools (108 total)
 
 Custom tools registered via the `@opencode-ai/plugin` SDK. Available to all agents after installing the plugin.
 
@@ -215,6 +240,17 @@ Custom tools registered via the `@opencode-ai/plugin` SDK. Available to all agen
 | **dice** | Roll dice with standard notation (e.g., `2d6`) |
 | **password** | Generate cryptographically secure passwords |
 | **lottery** | Pick random items from a list |
+
+### AI Detection (2)
+| Tool | Description |
+|------|-------------|
+| **ai-detector** | Advanced AI-generated text detection across 12 signal dimensions |
+| **ai-senior** | Senior AI Detection Aggregator — compiles results from multiple detectors |
+
+### Build & Planning (1)
+| Tool | Description |
+|------|-------------|
+| **plan-executor** | Read and extract prompt execution queue from Meta-Architect build plans |
 
 ### Cross-Platform (4)
 | Tool | Description |
