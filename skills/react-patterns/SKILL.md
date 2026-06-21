@@ -2,6 +2,11 @@
 name: react-patterns
 description: Use when discussing React component design, hooks, state management, or rendering patterns. Covers hooks patterns, component composition, performance optimization (useMemo/useCallback), Context vs Redux vs Zustand, custom hooks, render props, compound components, and error boundaries.
 ---
+## Git Delegation Rule
+
+**HARD RULE**: NEVER run git commands. Delegate ALL git operations to `commit-crafter` or `git-wrangler`.
+
+
 
 # React Patterns
 

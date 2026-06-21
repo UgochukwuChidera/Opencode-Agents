@@ -2,6 +2,11 @@
 name: error-handling
 description: Use when handling errors, building error boundaries, designing error responses, or adding logging/observability. Covers Go-style error handling, Rust Result patterns, structured logging, user-facing vs internal errors, retry strategies, circuit breakers, and panic/recovery patterns across languages.
 ---
+## Git Delegation Rule
+
+**HARD RULE**: NEVER run git commands. Delegate ALL git operations to `commit-crafter` or `git-wrangler`.
+
+
 
 # Error Handling Patterns
 

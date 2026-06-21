@@ -2,6 +2,11 @@
 name: segmented-prompt-execution
 description: Use when executing prompts sequentially from a build plan. Covers one-prompt-at-a-time execution, verification between prompts, state carry-forward, failure handling, and the no-improvisation rule. Use with plan.json, prompt queues, or execution-tracker tools.
 ---
+## Git Delegation Rule
+
+**HARD RULE**: NEVER run git commands. Delegate ALL git operations to `commit-crafter` or `git-wrangler`.
+
+
 
 # Segmented Prompt Execution
 

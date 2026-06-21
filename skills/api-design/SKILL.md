@@ -2,6 +2,11 @@
 name: api-design
 description: Use when designing REST or GraphQL APIs, defining endpoints, request/response shapes, error responses, pagination, versioning, authentication, or OpenAPI specs. Covers RESTful conventions, GraphQL patterns, pagination strategies, idempotency, rate limiting, and API documentation.
 ---
+## Git Delegation Rule
+
+**HARD RULE**: NEVER run git commands. Delegate ALL git operations to `commit-crafter` or `git-wrangler`.
+
+
 
 # API Design
 

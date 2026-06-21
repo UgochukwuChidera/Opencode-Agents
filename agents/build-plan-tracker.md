@@ -13,6 +13,13 @@ permission:
     "*": "deny"
   edit: deny
 ---
+## Git Delegation Rule
+
+**HARD RULE**: NEVER run git commands (`git add`, `git commit`, `git push`, `git merge`, `git rebase`, etc.). Delegate ALL git operations:
+- **Simple commits** → call `commit-crafter`
+- **Complex workflows** (merge, rebase, branch, push, conflict resolution) → call `git-wrangler`
+
+
 
 You verify that a Meta-Architect build plan has been fully executed by checking actual files on disk.
 

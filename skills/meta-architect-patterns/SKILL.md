@@ -2,6 +2,11 @@
 name: meta-architect-patterns
 description: Use when executing a Meta-Architect build plan from plan.json. Covers plan structure parsing, prompt execution order, component spec compliance, ADR enforcement, and design token usage. Also use when working with .meta-architect/plan.json, build context files, or Meta-Architect evaluators.
 ---
+## Git Delegation Rule
+
+**HARD RULE**: NEVER run git commands. Delegate ALL git operations to `commit-crafter` or `git-wrangler`.
+
+
 
 # Meta-Architect Patterns
 

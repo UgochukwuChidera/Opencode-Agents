@@ -2,6 +2,11 @@
 name: security-review
 description: Use when reviewing code for security vulnerabilities, auditing authentication/authorization, handling secrets, or assessing OWASP Top 10 risks. Covers XSS, CSRF, injection attacks, auth patterns (JWT, OAuth, sessions), secret management, dependency scanning, CSP headers, and secure defaults.
 ---
+## Git Delegation Rule
+
+**HARD RULE**: NEVER run git commands. Delegate ALL git operations to `commit-crafter` or `git-wrangler`.
+
+
 
 # Security Review
 

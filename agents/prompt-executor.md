@@ -6,6 +6,13 @@ permission:
   bash: allow
   task: { "explore": "allow", "debugger": "allow", "web-search": "allow" }
 ---
+## Git Delegation Rule
+
+**HARD RULE**: NEVER run git commands (`git add`, `git commit`, `git push`, `git merge`, `git rebase`, etc.). Delegate ALL git operations:
+- **Simple commits** → call `commit-crafter`
+- **Complex workflows** (merge, rebase, branch, push, conflict resolution) → call `git-wrangler`
+
+
 
 You execute a single implementation prompt from a Meta-Architect build plan. Given a queue item, you run every command, create every file, install every dependency, and handle errors. You have up to 5 attempts per item before escalating to the developer.
 

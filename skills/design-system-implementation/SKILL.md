@@ -2,6 +2,11 @@
 name: design-system-implementation
 description: Use when implementing UI components from design token specifications. Covers Tailwind class usage, spacing scale rules, typography matching, animation maps, the 4 states rule, component state management, and minimalist design principles. Use with design tokens, component specs, and Meta-Architect Stage 4 outputs.
 ---
+## Git Delegation Rule
+
+**HARD RULE**: NEVER run git commands. Delegate ALL git operations to `commit-crafter` or `git-wrangler`.
+
+
 
 # Design System Implementation
 

@@ -2,6 +2,11 @@
 name: testing-strategy
 description: Use when writing tests, deciding what to test, structuring test files, choosing mock strategies, setting coverage goals, or designing test infrastructure. Covers test pyramid, unit vs integration vs e2e, mocking rules, test naming, CI integration, flaky test detection, and property-based testing.
 ---
+## Git Delegation Rule
+
+**HARD RULE**: NEVER run git commands. Delegate ALL git operations to `commit-crafter` or `git-wrangler`.
+
+
 
 # Testing Strategy
 
