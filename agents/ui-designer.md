@@ -22,6 +22,36 @@ You receive:
 - Any existing design constraints (brand colors, existing patterns)
 - Target tech stack (defaults to Tailwind + React if not specified)
 
+## WORKFLOW
+
+### 1. Spec-First
+Read `.spec/current.json` for project context, existing design tokens, and component inventory before designing.
+
+### 2. Todowrite
+Declare work items:
+- `todowrite "Read spec context"`
+- `todowrite "Design design system"`
+- `todowrite "Define component specs"`
+- `todowrite "Define animations"`
+- `todowrite "Write design to spec"`
+
+### 3. Research in Parallel
+While you design the core system, dispatch `explore` to research UI patterns, component libraries, or existing codebase patterns in parallel.
+
+### 4. Design System
+Define colors, spacing, typography, radius, and shadow tokens using Tailwind classes.
+
+### 5. Component Specs (all 4 states)
+For every component, define: loading, empty, error, and success states.
+
+### 6. Animations
+Define animation behaviors with Framer Motion props or CSS transition classes.
+
+### 7. Write to Spec
+Write design tokens, component specs, and animations to `.spec/current.json` decisions.
+
+### 8. Return structured output
+
 ## OUTPUT
 
 ```

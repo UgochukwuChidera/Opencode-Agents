@@ -1,0 +1,77 @@
+{
+  "$schema": "https://opencode.ai/spec-schema.json",
+  "title": "Execution Spec",
+  "description": "Every agent reads this before starting work and writes to it after completing. This is the single source of truth for execution state.",
+  "type": "object",
+  "required": ["phase", "context", "decisions", "work_items", "files", "next"],
+  "properties": {
+    "phase": {
+      "type": "string",
+      "enum": ["init", "research", "design", "implement", "review", "fix", "done", "blocked"],
+      "description": "Current phase of execution"
+    },
+    "context": {
+      "type": "object",
+      "description": "Current execution context",
+      "properties": {
+        "task": { "type": "string", "description": "What we're doing" },
+        "goal": { "type": "string", "description": "End state we're aiming for" },
+        "constraints": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "decisions": {
+      "type": "array",
+      "description": "Decisions made during execution",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "decision": { "type": "string" },
+          "rationale": { "type": "string" },
+          "alternatives": { "type": "array", "items": { "type": "string" } },
+          "made_by": { "type": "string" }
+        }
+      }
+    },
+    "work_items": {
+      "type": "array",
+      "description": "Work items, tracked for parallel execution",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "label": { "type": "string" },
+          "status": { "type": "string", "enum": ["pending", "in_progress", "completed", "skipped", "failed"] },
+          "assigned_to": { "type": "string" },
+          "depends_on": { "type": "array", "items": { "type": "string" } },
+          "parallel": { "type": "boolean", "description": "Can this run in parallel with others?" },
+          "output": { "type": "string", "description": "What this work item produced" }
+        }
+      }
+    },
+    "files": {
+      "type": "array",
+      "description": "Files created or modified",
+      "items": {
+        "type": "object",
+        "properties": {
+          "path": { "type": "string" },
+          "action": { "type": "string", "enum": ["create", "modify", "delete"] },
+          "reason": { "type": "string" }
+        }
+      }
+    },
+    "next": {
+      "type": "array",
+      "description": "Next steps — what the next agent should do",
+      "items": {
+        "type": "object",
+        "properties": {
+          "action": { "type": "string" },
+          "agent": { "type": "string", "description": "Which agent type should handle this" },
+          "reason": { "type": "string" }
+        }
+      }
+    }
+  }
+}
