@@ -1,0 +1,270 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Multi-Agent Spec System — Canonical Schema",
+  "description": "Defines the structure of .spec/current.json and .spec/agents/*.json for concurrent-safe multi-agent state management.",
+  "version": "1.0.0",
+  "definitions": {
+    "agent_file": {
+      "title": "Agent Output File",
+      "description": "Written by any sub-agent that runs in parallel with others. Each agent writes to its OWN file — never to current.json.",
+      "type": "object",
+      "required": ["agent", "status", "timestamp"],
+      "properties": {
+        "agent": {
+          "type": "string",
+          "description": "The agent type that wrote this file (e.g., prompt-executor, spec-verifier, historian)"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["success", "failed", "escalated", "pass", "fail", "complete", "incomplete", "done"]
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp of when the agent completed"
+        },
+        "target": {
+          "type": "string",
+          "description": "What the agent was targeting (prompt ID, component name, etc.)"
+        },
+        "files_created": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Files created by this agent (prompt-executor, executor, creator)"
+        },
+        "commands_run": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Commands executed by this agent"
+        },
+        "attempts": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Number of attempts taken (prompt-executor, debugger)"
+        },
+        "decisions": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/decision" },
+          "description": "Decisions, findings, or retry logs produced by this agent"
+        },
+        "checks": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/verification_check" },
+          "description": "Verification checks performed (spec-verifier)"
+        },
+        "failures": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/failure" },
+          "description": "Failures found during verification"
+        },
+        "adr_results": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/adr_result" },
+          "description": "ADR compliance results (adr-enforcer)"
+        },
+        "summary": {
+          "type": "object",
+          "description": "Summary counts for ADR or audit results"
+        },
+        "findings": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/finding" },
+          "description": "Quality findings (historian, reviewer)"
+        },
+        "prompts_total": { "type": "integer" },
+        "prompts_completed": { "type": "integer" },
+        "prompts_skipped": { "type": "integer" },
+        "prompts_failed": { "type": "integer" },
+        "missing_files": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "prompt_results": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/prompt_result" }
+        },
+        "tests_run": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "tests_passed": { "type": "boolean" }
+      }
+    },
+    "current_json": {
+      "title": "Canonical Context File",
+      "description": "The single source of truth for build/execution state. Written ONLY by coordinators (planner, executor, orchestrator) at deterministic sync points.",
+      "type": "object",
+      "required": ["status"],
+      "properties": {
+        "planPath": {
+          "type": "string",
+          "description": "Path to the plan.json being executed"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["planning", "planned", "executing", "complete", "failed"],
+          "description": "Overall pipeline status"
+        },
+        "phase": {
+          "type": "string",
+          "description": "Current phase within the pipeline (e.g., scaffold, parallel_prompts, evaluators, final_audit)"
+        },
+        "stack": {
+          "type": "object",
+          "description": "Tech stack decisions from Stage 0"
+        },
+        "adrs": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/adr" },
+          "description": "Architecture Decision Records from Stage 3"
+        },
+        "design_tokens": {
+          "type": "object",
+          "description": "Design tokens from Stage 4"
+        },
+        "component_specs": {
+          "type": "array",
+          "description": "Component specifications from Stage 4"
+        },
+        "agents": {
+          "type": "object",
+          "description": "Aggregated agent outputs merged from .spec/agents/*.json after each sync point. Keyed by agent file name (without extension).",
+          "additionalProperties": {
+            "$ref": "#/definitions/agent_file"
+          }
+        },
+        "decisions": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/decision" },
+          "description": "Accumulated decisions across all stages (planning phase only)"
+        },
+        "workItems": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/work_item" },
+          "description": "Outstanding work items (orchestrator)"
+        }
+      }
+    },
+    "decision": {
+      "type": "object",
+      "properties": {
+        "stage": { "type": "string" },
+        "agent": { "type": "string" },
+        "output": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "action": { "type": "string" },
+        "result": { "type": "string" },
+        "attempt": { "type": "integer" }
+      }
+    },
+    "verification_check": {
+      "type": "object",
+      "properties": {
+        "check": { "type": "string" },
+        "passed": { "type": "boolean" },
+        "details": { "type": "string" },
+        "failure_type": { "type": "string" }
+      }
+    },
+    "failure": {
+      "type": "object",
+      "properties": {
+        "check": { "type": "string" },
+        "severity": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
+        "recommendation": { "type": "string" }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "properties": {
+        "severity": { "type": "string", "enum": ["nitpick", "minor", "major", "critical"] },
+        "file": { "type": "string" },
+        "line": { "type": "integer" },
+        "issue": { "type": "string" },
+        "recommendation": { "type": "string" }
+      }
+    },
+    "adr": {
+      "type": "object",
+      "properties": {
+        "number": { "type": "integer" },
+        "title": { "type": "string" },
+        "status": { "type": "string", "enum": ["active", "superseded", "proposed"] },
+        "rules": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "adr_result": {
+      "type": "object",
+      "properties": {
+        "adr_number": { "type": "integer" },
+        "adr_title": { "type": "string" },
+        "status": { "type": "string", "enum": ["compliant", "violated", "not_applicable"] },
+        "evidence": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "violations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "file": { "type": "string" },
+              "line": { "type": "integer" },
+              "issue": { "type": "string" },
+              "severity": { "type": "string" },
+              "recommendation": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "prompt_result": {
+      "type": "object",
+      "properties": {
+        "label": { "type": "string" },
+        "status": { "type": "string" },
+        "files_expected": { "type": "integer" },
+        "files_found": { "type": "integer" },
+        "missing_files": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "error": { "type": "string" }
+      }
+    },
+    "work_item": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "description": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "in-progress", "done"] }
+      }
+    }
+  },
+  "file_patterns": {
+    ".spec/current.json": {
+      "description": "Canonical context. Written ONLY by coordinators at sync points. Read by all agents for context.",
+      "schema": { "$ref": "#/definitions/current_json" }
+    },
+    ".spec/agents/*.json": {
+      "description": "Per-agent output files. Each parallel agent writes to its OWN file. Never shared. Merged by coordinator.",
+      "schema": { "$ref": "#/definitions/agent_file" }
+    },
+    ".spec/schema.json": {
+      "description": "This file — the canonical schema definition.",
+      "schema": { "type": "object" }
+    }
+  },
+  "concurrency_rules": {
+    "golden_rule": "NO parallel agent writes to .spec/current.json. EVER.",
+    "read_path": ".spec/current.json — shared, read-only during execution",
+    "write_path": ".spec/agents/{unique-name}.json — each agent writes only to its OWN file",
+    "merge_owner": "The coordinator (meta-architect-executor, orchestrator, meta-architect-planner) is the ONLY agent that writes to .spec/current.json",
+    "merge_timing": "Only at deterministic sync points: after a parallel batch completes, before the next batch starts",
+    "merge_process": "1. Collect all .spec/agents/*.json → 2. Merge into current.json under agents.{key} → 3. Update phase/status → 4. Optionally clean up agent files",
+    "parallelism_rule": "Default to parallel. Only sequential when there is a HARD dependency between steps."
+  }
+}
