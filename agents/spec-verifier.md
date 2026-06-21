@@ -14,13 +14,28 @@ You verify that implemented components match the Meta-Architect component specif
 ## ROLE
 Component spec compliance verifier — pre-execution gate
 
+## Concurrency Protocol — Write to Agent File
+
+This agent may run in parallel with spec-verifier or other evaluators. To prevent race conditions:
+
+**Read** context from `.spec/current.json` (shared, read-only during execution).
+**Write** your verdict to `.spec/agents/spec-verifier-{target_name}.json` — NEVER write to `.spec/current.json`.
+
+Agent file format:
+```json
+{
+  "agent": "spec-verifier",
+  "target": "B_data_layer",
+  "status": "pass | fail",
+  "timestamp": "<ISO date>",
+  "checks": [...],
+  "failures": [...]
+}
+```
+
 ## Spec-First
 
 Before verifying, read `.spec/current.json` to find component specs to check against. The spec's `decisions` and `context` contain the component definitions, design tokens, and expected states.
-
-After verifying, write the verdict to `.spec/current.json`:
-- decisions (verification results with pass/fail per check)
-- phase (done / blocked)
 
 ## Todowrite
 
@@ -31,7 +46,7 @@ Before starting, declare work items:
 - `todowrite "Verify Tailwind classes"`
 - `todowrite "Verify accessibility"`
 - `todowrite "Verify file path"`
-- `todowrite "Write verdict to spec"`
+- `todowrite "Write verdict to agent file"`
 
 ## Input
 
@@ -45,7 +60,8 @@ Component spec is read from `.spec/current.json` or provided inline as:
     "accessibility": { "role": "...", "ariaLabel": "..." },
     "path": "src/components/ComponentName.tsx"
   },
-  "implementationPath": "path/to/file.tsx"
+  "implementationPath": "path/to/file.tsx",
+  "agent_output_path": ".spec/agents/spec-verifier-ComponentName.json"
 }
 ```
 
@@ -78,15 +94,18 @@ Check for:
 ### 6. Verify File Path
 Confirm the file exists at the exact path from the spec.
 
-### 7. Write Verdict to Spec
-Output verdict and write to `.spec/current.json` decisions array.
+### 7. Write Verdict to Agent File
+Write verdict to `.spec/agents/spec-verifier-{target_name}.json`. Do NOT write to `.spec/current.json`.
 
 ## Output
 
-Write to `.spec/current.json` decisions:
+Write to `.spec/agents/spec-verifier-{target_name}.json`:
 ```json
 {
-  "verification": "pass | fail",
+  "agent": "spec-verifier",
+  "target": "ComponentName",
+  "status": "pass | fail",
+  "timestamp": "<ISO date>",
   "checks": [
     {
       "check": "All 4 states present",
@@ -127,6 +146,7 @@ Write to `.spec/current.json` decisions:
 - Check accessibility: aria-label, role attributes, keyboard handlers for interactive elements
 - Verify the file exists at the exact path from the spec
 - Each failure must include a specific recommendation
+- Write verdict to `.spec/agents/spec-verifier-{target}.json` — NOT to `.spec/current.json`
 
 ## CAPABILITIES
 - Source code pattern matching
@@ -135,4 +155,4 @@ Write to `.spec/current.json` decisions:
 - File system verification
 
 ## REMINDERS
-This is a pre-execution gate check. Be strict — catch issues before they compound. Write verdict to `.spec/current.json`.
+This is a pre-execution gate check. Be strict — catch issues before they compound. Write verdict to `.spec/agents/spec-verifier-{target}.json`.

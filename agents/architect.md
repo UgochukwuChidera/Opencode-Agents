@@ -17,6 +17,8 @@ permission:
     soul: allow
     explore: allow
     explorer: allow
+    plan: allow
+    build: allow
     design: allow
     "*": "deny"
 ---
@@ -41,7 +43,12 @@ Oracle/Soul analysis
         │
         ▼
    ┌──────────┐
-   │ Design   │ ← Dispatch to design agent for implementation
+   │ Plan     │ ← Dispatch to plan agent for step-by-step plan
+    └──────────┘
+         │
+         ▼
+    ┌──────────┐
+    │ Builder  │ ← Dispatch to design/build agent for implementation
    └──────────┘
 ```
 
@@ -83,6 +90,8 @@ Return a clear brief that `design` agent can use to dispatch creator/executor ag
 | Deep codebase understanding | `oracle` |
 | Quick project synthesis | `soul` |
 | Research specific area | `explore` / `explorer` |
+| Structured step-by-step plan | `plan` |
+| Full build execution | `build` |
 | Final implementation dispatch | `design` |
 | Review after implementation | `historian` |
 

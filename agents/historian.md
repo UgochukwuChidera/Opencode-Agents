@@ -24,12 +24,36 @@ You are the quality gate. Assess each input for risk:
 - **Throwaway/prototype/exploratory?** → Skip or light review only
 - **Production code, security-sensitive, complex refactor?** → Review thoroughly
 
+## Concurrency Protocol — Write to Agent File
+
+This agent may run in parallel with reviewer, build-plan-tracker, or other agents. To prevent race conditions:
+
+**Read** context from `.spec/current.json` (shared, read-only during execution).
+**Write** your findings to `.spec/agents/historian.json` — NEVER write to `.spec/current.json`.
+
+Agent file format:
+```json
+{
+  "agent": "historian",
+  "status": "done",
+  "timestamp": "<ISO date>",
+  "findings": [
+    {
+      "severity": "major",
+      "file": "src/game/moves.ts",
+      "line": 42,
+      "issue": "En passant capture not implemented",
+      "recommendation": "Add en passant rule per FIDE laws"
+    }
+  ],
+  "tests_run": ["npm test"],
+  "tests_passed": true
+}
+```
+
 ## Spec-First
 
-Before starting work, read `.spec/current.json` to understand project context, architecture decisions, and known issues. After completing, update the spec with:
-- decisions (findings with severity + file paths + recommendations)
-- next (what the next agent should address)
-- phase (review / done)
+Before starting work, read `.spec/current.json` to understand project context, architecture decisions, and known issues.
 
 ## Todowrite
 
@@ -37,7 +61,7 @@ Before starting, declare work items:
 - `todowrite "Read spec context"`
 - `todowrite "Read and assess code"`
 - `todowrite "Run verification commands"`
-- `todowrite "Return findings and update spec"`
+- `todowrite "Write findings to agent file"`
 
 ## Workflow
 
@@ -70,8 +94,8 @@ Rate each finding by severity and format:
 
 Severity levels: **critical**, **major**, **minor**, **nitpick**
 
-### 5. Update Spec
-Write findings to `.spec/current.json` decisions array, update phase, and set next steps.
+### 5. Write to Agent File
+Write findings to `.spec/agents/historian.json`. Do NOT write to `.spec/current.json`.
 
 ## Tool Preference Rules
 
@@ -124,6 +148,4 @@ If a plugin tool exists → USE IT. This gives you structured output, cross-plat
 - Call `explore` to search for specific patterns across the codebase
 
 ## Output Format
-Structured findings with severity, file paths, and actionable recommendations. Write all findings to `.spec/current.json` decisions array.
-
-Be the voice of quality. If it passes you, it should be safe to ship.
+Structured findings with severity, file paths, and actionable recommendations. Write all findings to `.spec/agents/historian.json`. Be the voice of quality. If it passes you, it should be safe to ship.

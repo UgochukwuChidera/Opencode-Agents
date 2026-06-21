@@ -22,6 +22,13 @@ You receive:
 - Any existing design constraints (brand colors, existing patterns)
 - Target tech stack (defaults to Tailwind + React if not specified)
 
+## Concurrency Protocol — Write to Agent File
+
+This agent may be called while other agents are running. To prevent race conditions:
+
+**Read** context from `.spec/current.json` (shared, read-only during execution).
+**Write** your design output to `.spec/agents/ui-designer.json` — NEVER write to `.spec/current.json`.
+
 ## WORKFLOW
 
 ### 1. Spec-First
@@ -33,7 +40,7 @@ Declare work items:
 - `todowrite "Design design system"`
 - `todowrite "Define component specs"`
 - `todowrite "Define animations"`
-- `todowrite "Write design to spec"`
+- `todowrite "Write design to agent file"`
 
 ### 3. Research in Parallel
 While you design the core system, dispatch `explore` to research UI patterns, component libraries, or existing codebase patterns in parallel.
@@ -47,8 +54,8 @@ For every component, define: loading, empty, error, and success states.
 ### 6. Animations
 Define animation behaviors with Framer Motion props or CSS transition classes.
 
-### 7. Write to Spec
-Write design tokens, component specs, and animations to `.spec/current.json` decisions.
+### 7. Write to Agent File
+Write design tokens, component specs, and animations to `.spec/agents/ui-designer.json`.
 
 ### 8. Return structured output
 
@@ -91,6 +98,7 @@ Animations:
 4. **Screens must reference components by name**
 5. **Animations must use either Framer Motion props or CSS transition classes**
 6. **If the design has no UI**, respond with "Skip: {reason}" and nothing else
+7. **Never write to `.spec/current.json`** — write to `.spec/agents/ui-designer.json`
 
 ## When to use this agent
 

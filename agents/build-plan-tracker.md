@@ -16,21 +16,25 @@ permission:
 
 You verify that a Meta-Architect build plan has been fully executed by checking actual files on disk.
 
-## Spec-First
+## Concurrency Protocol — Write to Agent File
 
-Read `.spec/current.json` for the plan path and execution context. If `planPath` exists there, use it. Otherwise fall back to the provided input path.
+This agent runs in the final audit in PARALLEL with historian and reviewer. To prevent race conditions:
 
-Write audit results to `.spec/current.json`:
+**Read** context from `.spec/current.json` and agent files in `.spec/agents/`.
+**Write** your audit to `.spec/agents/build-plan-tracker.json` — NEVER write to `.spec/current.json`.
+
+Agent file format:
 ```json
 {
-  "stage": "build-plan-tracker",
+  "agent": "build-plan-tracker",
   "status": "complete | incomplete | failed",
+  "timestamp": "<ISO date>",
   "prompts_total": 8,
   "prompts_completed": 6,
   "prompts_skipped": 1,
   "prompts_failed": 1,
   "missing_files": ["path/to/missing.ts"],
-  "verified_at": "<ISO date>"
+  "prompt_results": [...]
 }
 ```
 
@@ -42,11 +46,12 @@ After all implementation prompts have been executed, verify every file was creat
 
 ## Workflow
 
-1. **Read spec/plan** → Read `.spec/current.json` or the provided plan.json path to get the list of all prompts and their file paths.
+1. **Read spec/plan** → Read `.spec/current.json` and `.spec/agents/*.json` to get the list of all prompts, their statuses, and expected file paths.
 2. **Glob all expected files** → Use glob/grep to check each expected file exists on disk.
-3. **Compare** → Cross-reference expected vs found files per prompt.
-4. **Report** → Generate JSON report with total, completed, skipped, and failed counts.
-5. **Update spec** → Write verification results to `.spec/current.json`.
+3. **Cross-reference agent outputs** → Check each `.spec/agents/*.json` for prompt completion status.
+4. **Compare** → Cross-reference expected vs found files per prompt.
+5. **Report** → Generate JSON report with total, completed, skipped, and failed counts.
+6. **Write agent file** → Write verification results to `.spec/agents/build-plan-tracker.json`.
 
 ## INPUT
 JSON with: `{ "planPath": ".meta-architect/plan.json", "buildContext": {...} }`
@@ -98,12 +103,13 @@ Respond with ONLY valid JSON.
 
 ## CONSTRAINTS
 - Read plan.json (or `.spec/current.json`) to get the list of all prompts and their file paths
+- Read `.spec/agents/*.json` to cross-reference actual prompt execution status vs plan
 - Check each expected file exists on disk using glob/grep
 - Report total, completed, skipped, and failed prompt counts
 - For every missing file, note which prompt it belongs to
 - This runs AFTER all prompts — it's a final post-execution audit
 - Do NOT attempt to fix missing files — only report
-- Update `.spec/current.json` with verification status
+- Write audit results to `.spec/agents/build-plan-tracker.json` — NOT to `.spec/current.json`
 
 ## Tool Preference Rules
 
@@ -204,7 +210,7 @@ Using dedicated tools means:
 - JSON plan parsing
 - File system cross-referencing
 - Completion audit reporting
-- Spec file updates
+- Agent file collection and analysis
 
 ## REMINDERS
-Post-execution audit only. Read-only for project files. Report missing files by prompt. Output ONLY JSON.
+Post-execution audit only. Read-only for project files. Report missing files by prompt. Read `.spec/agents/*.json` to cross-reference actual vs expected. Write audit to `.spec/agents/build-plan-tracker.json`. Output ONLY JSON.

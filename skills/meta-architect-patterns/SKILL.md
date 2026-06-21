@@ -24,16 +24,29 @@ A Meta-Architect build plan is a JSON file at `.meta-architect/plan.json` with t
 }
 ```
 
+## Agent File Protocol — Concurrency Safety
+
+When multiple agents run in parallel (which is the default), NO agent writes to `.spec/current.json`. Instead:
+
+- **Every parallel agent** writes its output to `.spec/agents/{unique-name}.json`
+- **Only the coordinator** (executor, orchestrator, planner) writes to `.spec/current.json` at deterministic sync points
+- **The merge step** collects agent files and merges them into `current.json` under `agents.{key}`
+
+See `.spec/schema.json` for the canonical structure definition.
+
 ## Execution Order
 
-Always execute prompts in this strict order:
+Always execute prompts in this strict order within each batch:
 
 1. **Prompt A (Scaffold)** — Project structure, package.json, configs, Dockerfile
 2. **Prompt B (Data Layer)** — Prisma schema, migrations, database setup
 3. **C-Backend features** — One at a time, in the order listed. Each depends on B.
 4. **C-UI features** — One at a time, in the order listed. Each depends on its backend counterpart.
 
-Never skip a prompt. Never reorder prompts. Never execute two prompts in parallel unless they are in the same group and have no cross-dependency.
+Within a batch: parallel is safe (B and all C prompts run concurrently).
+Across batches: sequential (A must finish before B+C starts).
+
+Never skip a prompt. Never reorder across batches.
 
 ## Component Spec Compliance
 

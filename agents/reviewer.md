@@ -31,16 +31,37 @@ You review code critically. Focus on:
 - Missing edge cases and error handling
 - API design issues
 
+## Concurrency Protocol — Write to Agent File
+
+This agent may run in parallel with historian, build-plan-tracker, or other agents. To prevent race conditions:
+
+**Read** context from `.spec/current.json` (shared, read-only during execution).
+**Write** your findings to `.spec/agents/reviewer.json` — NEVER write to `.spec/current.json`.
+
+Agent file format:
+```json
+{
+  "agent": "reviewer",
+  "status": "done",
+  "timestamp": "<ISO date>",
+  "findings": [
+    {
+      "severity": "critical",
+      "file": "src/routes/auth.ts",
+      "line": 23,
+      "issue": "No rate limiting on login endpoint",
+      "recommendation": "Add rate limiting middleware"
+    }
+  ]
+}
+```
+
 ## Spec-First
 
 Before starting, read `.spec/current.json` for:
 - What files changed and why
 - Existing decisions and findings from prior reviews
 - Architecture decisions (ADRs) that may constrain code choices
-
-After reviewing, update `.spec/current.json` with:
-- decisions (findings with severity + file paths + recommendations)
-- phase (review / done)
 
 ## Todowrite
 
@@ -49,7 +70,7 @@ Before starting, declare work items:
 - `todowrite "Read target code"`
 - `todowrite "Cross-reference codebase"`
 - `todowrite "Run linters and checks"`
-- `todowrite "Rate findings and update spec"`
+- `todowrite "Rate findings and write to agent file"`
 
 ## Workflow
 
@@ -75,8 +96,8 @@ Use `glob`/`grep` to check consistency with the rest of the codebase:
 ### 5. Rate Findings
 Rate each finding by severity: **critical**, **major**, **minor**, **nitpick**
 
-### 6. Update Spec
-Write all findings to `.spec/current.json` decisions array with full details.
+### 6. Write to Agent File
+Write all findings to `.spec/agents/reviewer.json`. Do NOT write to `.spec/current.json`.
 
 ## Tool Preference Rules
 
