@@ -106,6 +106,8 @@ Read `execution-queue.json`. Sort prompts by priority. Execute in this order:
    → AFTER BATCH COMPLETES: Run merge step to collect all outputs
 ```
 
+Note: For prompts that involve full build execution (not just file creation), the built-in **build** platform agent is a valid alternative to prompt-executor. If a prompt's requirements match a full build pipeline (compile, test, package), delegate to `build` instead of `prompt-executor` and pass the prompt's spec as context.
+
 For each prompt (whether sequential or parallel):
 
 ```

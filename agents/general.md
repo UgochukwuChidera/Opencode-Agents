@@ -43,6 +43,8 @@ If a dedicated agent exists for a sub-task, USE IT. Do not self-execute:
 - **debugger** — for investigating errors and test failures
 - **dependency-auditor** — for dependency auditing
 - **ui-designer** — for UI/UX design work
+- **plan** (built-in) — for step-by-step execution planning
+- **build** (built-in) — for full build execution pipeline
 - **commit-crafter** — for staging and committing changes
 - **historian** — for code review and quality checking
 - **test-writer** — for writing tests
