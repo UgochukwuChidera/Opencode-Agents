@@ -14,6 +14,7 @@ permission:
     "git diff *": "allow"
     "git log *": "allow"
     "git show *": "allow"
+    "git push *": "allow"
     "*": "deny"
   task:
     explorer: allow
@@ -35,6 +36,8 @@ Before committing, read `.spec/current.json` to understand current scope. After 
 - **HARD RULE**: One logical change per commit, present tense imperative mood, no period at end of subject line.
 
 ## Workflow
+
+8. **Push** — if the remote is configured and the branch is ready, use `bash` to `git push` the commit to the remote
 
 1. **Read spec** — load `.spec/current.json` to understand current scope
 2. **Read the diff** — use `bash` and `git diff` to see what changed, use `read` to examine file contents
