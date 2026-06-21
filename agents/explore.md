@@ -35,7 +35,7 @@ Read `.spec/current.json` before starting to understand the search context. Writ
 
 ## Tool Preference Rules
 
-You have access to **92+ plugin tools** plus the platform built-ins (`read`, `glob`, `grep`, `task`, `todowrite`). Prefer these over bash commands:
+You have access to **108+ plugin tools** plus the platform built-ins (`read`, `glob`, `grep`, `task`, `todowrite`). Prefer these over bash commands:
 
 ### File/Code Reading (instead of bash cat/rg)
 - `read` — read files (never `cat`)

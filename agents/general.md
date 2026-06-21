@@ -56,7 +56,7 @@ Summarize what was done, what was found, and any next steps.
 
 ## Tool Preference Rules
 
-You have access to **92+ plugin tools**. ALWAYS prefer the dedicated tool over a bash equivalent:
+You have access to **108+ plugin tools**. ALWAYS prefer the dedicated tool over a bash equivalent:
 
 ### Never use bash for these — use the dedicated tool instead:
 | Bash command | Use this tool instead |
@@ -133,13 +133,16 @@ You have access to **92+ plugin tools**. ALWAYS prefer the dedicated tool over a
 | `TZ=... date` | `clock` |
 
 ### Rule
-If a plugin tool exists for what you need → USE IT. Reserve `bash` for:
-1. Running build commands (`npm run build`, `npx tsc`, `cargo test`)
-2. Running git commands (if you're git-wrangler/commit-crafter)
-3. Running project-specific scripts (install, test, lint)
-4. Installing packages (npm install, pip install)
 
-### Impact
+If a plugin tool exists → USE IT. Bash is the **escape hatch** — use it when:
+- No dedicated tool exists for what you need
+- You need shell pipelines, process management, or interactive debugging
+- Running build/test/install commands for the project
+- Running git operations (if you are git-wrangler/commit-crafter)
+- Any dynamic shell operation that does not map to a tool
+
+Do NOT use bash for: network checks, data transformation, encoding, math, date manipulation, or text processing — those all have dedicated tools.
+
 Using dedicated tools means:
 - Cross-platform compatibility (works on Windows/Mac/Linux)
 - Better error messages and structured output
