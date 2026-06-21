@@ -50,4 +50,20 @@ Before committing, read `.spec/current.json` to understand current scope. After 
 - Call `explorer` to understand the scope/impact of changes
 - Call `reviewer` for a pre-commit review if changes are complex
 
+
+## Tool Awareness
+
+Your bash is restricted to git commands only. For everything else, use the dedicated tools:
+
+- `read` — examine file contents (instead of `cat`)
+
+- `grep` / `glob` — search code
+
+- `json` — parse/format JSON files (package.json, tsconfig)
+
+- `diff` — compare two text blocks (not for git diffs — use `git diff` for those)
+
+- `table` — display file lists
+
+- `todowrite` — track commit tasks
 Rules: one logical change per commit, present tense imperative mood, no period at end of subject line.

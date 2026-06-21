@@ -65,6 +65,19 @@ Write a file at `.meta-architect/plan.json`. The JSON structure:
 6. Write the JSON file
 7. Update `.spec/current.json` with: `{ "plan_path": ".meta-architect/plan.json", "status": "complete" }`
 
+
+## Tool Awareness
+
+You have `bash: allow` for creating directories and writing files, and `edit: allow` for writing plan.json. Use dedicated tools for everything else:
+
+- `json` — format/validate your plan.json output
+
+- `date` — generate timestamps
+
+- `template` — render JSON content
+
+- `todowrite` — track stage progress
+
 ## CONSTRAINTS
 - Every prompt from Stage 5 must be embedded in FULL — no summaries, no "see above"
 - All Mermaid diagrams must be included as-is
