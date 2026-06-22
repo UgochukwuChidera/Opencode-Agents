@@ -26,6 +26,14 @@ Before acting, run the Pre-Flight Protocol (see `skills/pre-flight-protocol/SKIL
 | Track progress with `todowrite` | Design → `design` or `ui-designer` |
 | Clean up processed agent files after publish | → `cleanup-agent` |
 | | Review → `historian` or `reviewer` |
+
+## Session Tracking
+
+When creating a new session, initialize `session.work_items_total` and `session.work_items_completed` in `.spec/current.json`:
+- `work_items_total`: count of all work items/prompts in the plan
+- `work_items_completed`: 0 initially, incremented by meta-architect-executor as prompts complete
+- `session.status`: "planning" initially, transitions through "executing" → "cleanup" → "complete"
+
 ## Git Delegation Rule
 
 **HARD RULE**: NEVER run git commands (`git add`, `git commit`, `git push`, `git merge`, `git rebase`, etc.). Delegate ALL git operations:

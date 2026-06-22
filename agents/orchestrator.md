@@ -105,9 +105,12 @@ After each parallel batch completes:
 1. Read `.spec/current.json`
 2. Read all `.spec/agents/*.json` files created in this batch
 3. Merge each agent's output into `current.json` under `agents.{filename_without_ext}`
-4. Update `current.json` phase and status
-5. Publish merged results — write to `.spec/current.json` with updated session phase
-6. Dispatch cleanup-agent — call `cleanup-agent` with task:
+4. Count work items — tally dispatched vs completed from agent files and workItems
+   Set session.work_items_total = number of work items dispatched
+   Set session.work_items_completed = number marked "done"
+5. Update `current.json` phase and status with session counts
+6. Publish merged results — write to `.spec/current.json` with session counts and phase
+7. Dispatch cleanup-agent — call `cleanup-agent` with task:
    'Post-publish cleanup: remove stubs, prune packages, free space'
    Cleanup runs AFTER publish. If coordinator crashes before dispatch, agent files survive.
    The cleanup-agent detects stale session_ids from crashed sessions.

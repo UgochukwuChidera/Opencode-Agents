@@ -69,8 +69,11 @@ After each parallel batch completes, run this merge:
 2. Glob all `.spec/agents/*.json` files
 3. For each agent file, merge its `status`, `decisions`, `files_created` into `current.json` under `agents.{filename_without_ext}`
 4. Update `current.json` phase and status
-5. Publish merged results — write to `.spec/current.json` and update session phase to 'cleanup'
-6. Dispatch cleanup-agent — call `cleanup-agent` with task:
+5. Count work items — tally total prompts and completed prompts from agent output files
+   Set session.work_items_total = prompts_total from plan.json
+   Set session.work_items_completed = prompts_completed from agent files
+6. Publish merged results — write to `.spec/current.json` with session counts and phase='cleanup'
+7. Dispatch cleanup-agent — call `cleanup-agent` with task:
    'Post-publish cleanup: remove session agent stubs, scan for unused packages, free disk space'
    The cleanup-agent handles dry-run, confirmation, execution, and reporting.
    Agent files survive if coordinator crashes before this step — cleanup-agent detects stale session_ids.
