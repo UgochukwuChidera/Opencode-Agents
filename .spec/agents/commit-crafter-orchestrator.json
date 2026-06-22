@@ -1,0 +1,6 @@
+{
+  "agent": "commit-crafter",
+  "commit_hash": "c95d9d2",
+  "files_committed": ["agents/meta-architect-orchestrator.md"],
+  "last_action": "feat(orchestrator): add delegation routing table and absolute no-self-execution rule"
+}

@@ -6,7 +6,7 @@ Custom agent definitions, tool plugins, and skill instructions for [opencode](ht
 
 ```
 Opencode-Agents/
-├── agents/         # 27 agent personality definitions (markdown)
+├── agents/         # 32 agent personality definitions (markdown)
 ├── tools/          # Custom tool plugins (ESM modules)
 │   ├── index.mjs           # Main plugin aggregator (register this in opencode.jsonc)
 │   ├── bash-tool.mjs       # Cross-platform shell execution
@@ -36,7 +36,15 @@ Opencode-Agents/
 │   ├── security-review/SKILL.md
 │   ├── design-system-implementation/SKILL.md
 │   ├── meta-architect-patterns/SKILL.md
-│   └── segmented-prompt-execution/SKILL.md
+│   ├── segmented-prompt-execution/SKILL.md
+│   ├── pre-flight-protocol/SKILL.md         # ← NEW
+│   ├── database-data-layer/SKILL.md         # ← NEW
+│   ├── authentication-authorization/SKILL.md # ← NEW
+│   └── deployment-devops/SKILL.md           # ← NEW
+├── .spec/          # Spec-First state management (tracking + concurrency)
+│   ├── schema.json           # Canonical schema for current.json + agent files
+│   ├── current.json          # Canonical read-only context — only coordinator writes
+│   └── agents/               # Per-agent output files (parallel-safe writes)
 ├── setup.sh        # Linux/macOS setup script
 ├── setup.bat       # Windows setup script
 └── README.md       # This file
@@ -44,38 +52,42 @@ Opencode-Agents/
 
 ## Agents
 
+Every agent follows the **Spec-First** pattern: READ `.spec/current.json` before ANY action, then CLASSIFY work vs delegation via the **Pre-Flight Protocol**. All 32 agents have mandatory pre-flight checks and a "My Job vs Not My Job" table baked in.
+
 | Agent | Mode | Description |
 |-------|------|-------------|
-| **meta-architect-orchestrator** | `all` | Entry point for all developer requests — classifies task and delegates |
-| **orchestrator** | `all` | Breaks down complex tasks and delegates to specialist sub-agents in parallel |
-| **design** | `all` | Dynamic orchestrator of soul, creator, and historian agents |
-| **oracle** | `all` | Deep codebase understanding for large-scale architectural analysis |
-| **soul** | `subagent` | Synthesizes project essence — architecture, conventions, domain model |
-| **creator** | `subagent` | Creative implementor — fuses ideas into elegant code |
-| **executor** | `subagent` | Implements code changes from specs |
-| **explorer** | `subagent` | Read-only codebase research |
-| **historian** | `subagent` | Critical quality guardian — catches errors, over-engineering, security holes |
-| **reviewer** | `subagent` | Reviews code for bugs, security, and best practices |
-| **debugger** | `subagent` | Investigates runtime errors and test failures by systematic root cause analysis |
-| **test-writer** | `subagent` | Writes tests covering edge cases and regressions |
-| **commit-crafter** | `subagent` | Stages files and writes conventional commits |
-| **git-wrangler** | `subagent` | Handles full git workflows — stash, pull, branch, merge, rebase, resolve conflicts, push |
-| **dependency-auditor** | `subagent` | Audits dependencies for updates and vulnerabilities |
-| **adr-enforcer** | `subagent` | Verifies code follows Architecture Decision Records |
-| **build-plan-tracker** | `subagent` | Verifies plan.json prompts against files on disk |
-| **prompt-executor** | `subagent` | Executes a single prompt from a Meta-Architect build plan |
-| **spec-verifier** | `subagent` | Verifies implemented components match Meta-Architect specs |
-| **ui-designer** | `subagent` | Standalone UI/UX design agent — creates design systems and specs |
-| **architect** | `subagent` | Turns analysis into actionable architecture plans |
-| **meta-architect-planner** | `subagent` | Runs the 6-stage Meta-Architect planning pipeline |
-| **meta-architect-executor** | `subagent` | Executes a Meta-Architect build plan |
-| **meta-architect-stage-0** | `subagent` | Stack inference specialist |
-| **meta-architect-stage-1** | `subagent` | Clarification analyst |
-| **meta-architect-stage-2** | `subagent` | Domain modeling expert |
-| **meta-architect-stage-3** | `subagent` | Software architect |
-| **meta-architect-stage-4** | `subagent` | UI/UX designer |
-| **meta-architect-stage-5** | `subagent` | Build-prompt engineer |
-| **meta-architect-stage-6** | `subagent` | Build plan writer |
+| **meta-architect-orchestrator** | `all` | Entry point for ALL developer requests — classifies task and delegates. NEVER writes code, runs commands, or touches git. Has the ABSOLUTE RULE. |
+| **orchestrator** | `all` | Breaks down complex tasks, delegates to specialist sub-agents in parallel, merges agent files, tracks via `.spec/current.json`. Pre-flight + routing table baked in. |
+| **meta-architect-planner** | `subagent` | Runs the 6-stage Meta-Architect planning pipeline — accumulates compact decision records in-memory, dispatches stage agents, writes plan.json |
+| **meta-architect-executor** | `subagent` | Executes a Meta-Architect build plan — extracts prompt queue, dispatches prompt-executor for each, runs evaluators, merges agent files, calls debugger on failure |
+| **design** | `all` | Dynamic orchestrator — ascertains details, synthesizes context via soul/oracle, produces design spec, dispatches to creator/executor, reviews via historian. Pre-flight + git delegation baked in. |
+| **oracle** | `all` | Deep codebase understanding for large-scale architectural analysis — dispatches parallel explore sub-agents. Writes analysis to agent file. |
+| **architect** | `subagent` | Turns analysis into actionable architecture plans — bridges oracle → structured plan → execution |
+| **soul** | `subagent` | Synthesizes project essence — architecture, conventions, domain model. Fast, focused synthesis. |
+| **creator** | `subagent` | Creative implementor — fuses ideas into elegant code. Writes agent file, delegates git to commit-crafter. Pre-flight + git delegation baked in. |
+| **executor** | `subagent` | Implements code changes from specs — fast, clean, pattern-aware. Writes agent file, delegates git to commit-crafter. Pre-flight + git delegation baked in. |
+| **prompt-executor** | `subagent` | Executes a single prompt from a Meta-Architect build plan — runs commands, creates files, retries up to 5 times. Writes per-prompt agent file. |
+| **explorer** | `subagent` | Read-only codebase research — searches code, finds patterns, maps structure. Fast, parallel dispatch. |
+| **explore** | `subagent` | Fast agent specialized for exploring codebases — quickly finds files by patterns, searches code for keywords |
+| **historian** | `subagent` | Critical quality guardian — catches errors, over-engineering, security holes. Reviews code, runs tests, updates spec with findings. Writes to agent file. |
+| **reviewer** | `subagent` | Reviews code for bugs, security, and best practices — thorough but not blocking. Writes findings to agent file. |
+| **debugger** | `subagent` | Investigates runtime errors and test failures by systematic root cause analysis — reads code, traces backward, applies minimal fixes. Writes to agent file, delegates git. |
+| **test-writer** | `subagent` | Writes thorough tests covering happy path, edge cases, error states, and regressions. Writes to agent file, delegates git. |
+| **commit-crafter** | `subagent` | ONLY agent allowed to stage+commit. Stages files, writes conventional commits, writes commit metadata to agent file. Pre-flight baked in. |
+| **git-wrangler** | `subagent` | ONLY agent allowed to handle complex git workflows — stash, pull, branch, merge, rebase, resolve conflicts, push. Writes action log to agent file. |
+| **dependency-auditor** | `subagent` | Audits dependencies for updates and vulnerabilities. Writes to agent file. |
+| **spec-verifier** | `subagent` | Verifies implemented components match Meta-Architect component specs — checks all 4 states, Tailwind classes, accessibility. Writes verdict to agent file. |
+| **adr-enforcer** | `subagent` | Verifies code follows Architecture Decision Records — checks ORM, auth, API patterns, database types. Writes violations to agent file. |
+| **build-plan-tracker** | `subagent` | Verifies plan.json prompts against files on disk — cross-references agent files for audit trail |
+| **ui-designer** | `subagent` | Standalone UI/UX design agent — creates design systems, component specs with all 4 states, screen layouts, and animation maps. Writes to agent file. |
+| **general** | `subagent` | General-purpose agent for researching complex questions and executing multi-step tasks |
+| **meta-architect-stage-0** | `subagent` | Stack inference specialist — given an app description, outputs compact tech stack profile |
+| **meta-architect-stage-1** | `subagent` | Clarification analyst — generates focused questions about product ambiguities |
+| **meta-architect-stage-2** | `subagent` | Domain modeling expert — produces entity list, relationships, business rules, Mermaid ERD |
+| **meta-architect-stage-3** | `subagent` | Software architect — produces ADR decisions, routes, security items, Mermaid system diagram |
+| **meta-architect-stage-4** | `subagent` | UI/UX designer — produces design token summary, component specs, animation behaviors |
+| **meta-architect-stage-5** | `subagent` | Build-prompt engineer — generates full implementation prompts with actual code and commands |
+| **meta-architect-stage-6** | `subagent` | Build plan writer — compiles all stage outputs into the final plan.json file on disk |
 
 ## Skills
 
@@ -89,8 +101,87 @@ Skills are specialized Markdown instruction files that get loaded into the LLM's
 | **testing-strategy** | Test pyramid, mocking rules, coverage targets, CI integration |
 | **security-review** | OWASP Top 10, XSS, CSRF, auth patterns, secure defaults |
 | **design-system-implementation** | UI components from design token specs, Tailwind, 4 states rule |
-| **meta-architect-patterns** | Meta-Architect build plan execution and ADR enforcement |
-| **segmented-prompt-execution** | One-prompt-at-a-time execution from build plans |
+| **meta-architect-patterns** | Meta-Architect build plan execution, ADR enforcement, agent file protocol |
+| **segmented-prompt-execution** | One-prompt-at-a-time execution from build plans, agent file integration |
+| **pre-flight-protocol** | ⛔ Mandatory pre-flight check: READ → CLASSIFY → CHECK My Job vs Not My Job → STOP/GO → TRACK → LOG. Reusable across all agents. |
+| **database-data-layer** | Prisma ORM, raw SQL, migrations, seed data, connection pooling, query optimization |
+| **authentication-authorization** | JWT, OAuth, sessions, RBAC, MFA, password hashing, security headers |
+| **deployment-devops** | Docker, docker-compose, CI/CD (GitHub Actions), Railway, Fly.io, Vercel, environment config |
+
+## `.spec/` State Management & Concurrency Protocol
+
+A **Spec-First** system orchestrates multi-agent workflows with zero race conditions on shared state.
+
+### Architecture
+
+```
+.spec/
+├── schema.json          # Canonical schema for all spec files
+├── current.json         # READ-ONLY context for all agents (coordinator writes)
+└── agents/              # WRITE target for parallel sub-agents
+    ├── executor-{desc}.json
+    ├── creator-{desc}.json
+    ├── debugger-{desc}.json
+    ├── historian.json
+    ├── reviewer.json
+    ├── commit-crafter-{desc}.json
+    └── ... (one file per agent per batch)
+```
+
+### The Core Rule
+
+> **Parallel agents NEVER write to `.spec/current.json`.** They only **read** from it. Each agent writes to its **own file** under `.spec/agents/{name}.json`. The **coordinator** is the sole writer of `current.json`, merging agent files at deterministic sync points.
+
+### Agent File Lifecycle
+
+1. **Created** — by a sub-agent when it completes its work
+2. **Consumed** — by the coordinator, which merges all agent files into `current.json`
+3. **Cleaned** — by `executor` before the next batch begins (not after merge, so debug data survives crashes)
+
+### Why This Works
+
+- **No race conditions** — each agent writes to a unique file path
+- **No locks needed** — no mutexes, no distributed lock complexity
+- **Crash-resilient** — if the coordinator crashes mid-merge, agent files survive for investigation
+- **Auditable** — each agent's output is independently preserved
+
+### Sync Points
+
+The coordinator (`meta-architect-executor`) runs merges at fixed points:
+- Between each parallel batch of prompts
+- After verification/evaluation steps complete
+- Before escalation or cleanup
+
+## Pre-Flight Protocol
+
+**Every agent** — from entry-point orchestrator to specialist sub-agents — has a mandatory **Pre-Flight Check** baked into its definition. Before any action, the agent runs:
+
+```
+1. READ    .spec/current.json for context
+2. CLASSIFY the action (code? git? design? review?)
+3. CHECK   the "My Job vs Not My Job" table
+4. ✅ GO   if it's MY job → proceed
+5. ❌ STOP if it's NOT my job → DELEGATE to the right agent
+6. TRACK   progress via todowrite
+7. LOG     results to .spec/agents/{name}.json
+```
+
+Each agent's table categorizes 20+ task types:
+- **✅ My Job**: what this agent is designed to do (write code, debug, research, review, etc.)
+- **❌ Not My Job → Delegate**: touch git (→ `commit-crafter` or `git-wrangler`), design decisions (→ `design`), review (→ `historian`), etc.
+
+The protocol is codified as a reusable skill at `skills/pre-flight-protocol/SKILL.md`.
+
+## Git Delegation Rule
+
+A **HARD RULE** across all 32 agents:
+
+> **Only `commit-crafter` and `git-wrangler` may run git commands. All other agents must delegate git operations.**
+
+Simple commits → `commit-crafter`  
+Complex workflows (merge, rebase, push, conflict resolution) → `git-wrangler`
+
+Every non-git agent has this rule prominently stated in its definition. The entry-point orchestrator (`meta-architect-orchestrator`) has `edit: deny` and `bash: deny` — it physically cannot write files or run commands.
 
 ## Tools (108 total)
 
@@ -297,6 +388,25 @@ Restart opencode to load the tools.
   - Registered via `plugin` field in `opencode.jsonc`
 - **`skills/`** folder symlinked to `~/.config/opencode/skills/`
   - Auto-discovered on startup — no config entry needed
+- **`.spec/`** folder — state management and tracking for multi-agent workflows
+  - `schema.json` defines the canonical structure
+  - `current.json` is the read-only context (only coordinators write)
+  - `agents/` holds per-agent output files for parallel-safe state management
+
+### Spec-First Pattern
+
+Every agent follows this flow:
+1. **Spec-First**: Read `.spec/current.json` before any action
+2. **Pre-Flight**: Classify work vs delegation via the My Job vs Not My Job table
+3. **Git Delegation**: Never touch git — delegate to `commit-crafter` or `git-wrangler`
+4. **Agent File**: Write results to `.spec/agents/{name}.json` for the coordinator to merge
+
+### Concurrency Rules
+
+- Parallel agents read from `current.json` — never write to it
+- Each agent writes ONLY to its own file in `.spec/agents/`
+- The coordinator merges agent files at deterministic sync points
+- Agent files are cleaned by executor before the next batch starts (not after merge)
 
 ## Creating Custom Tools
 
