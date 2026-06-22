@@ -6,7 +6,7 @@ permission:
   glob: allow
   grep: allow
   list: allow
-  bash:
+  shell:
     "npm test *": "allow"
     "npm run lint": "allow"
     "cargo check": "allow"

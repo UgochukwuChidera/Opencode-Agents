@@ -182,8 +182,8 @@ import { planExecutorTool } from "./plan-executor.mjs";
  */
 const toolDefinitions = {
   // ── Shell (unified — auto-detects OS) ──
-  bash: bashTool,
-  // NOTE: No separate "powershell" tool needed — bashTool auto-detects Windows
+  shell: bashTool,
+  // NOTE: `bash` is deprecated — use `shell` instead
 
   // ── Web ──
   "web-search": webSearchTool,

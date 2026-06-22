@@ -6,7 +6,7 @@ permission:
   glob: allow
   grep: allow
   list: allow
-  bash:
+  shell:
     "rg *": "allow"
     "find *": "allow"
     "cat *": "allow"

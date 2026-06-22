@@ -6,7 +6,7 @@ permission:
   glob: allow
   grep: allow
   edit: deny
-  bash: deny
+  shell: deny
 ---
 
 ## ⛔ Pre-Flight Check

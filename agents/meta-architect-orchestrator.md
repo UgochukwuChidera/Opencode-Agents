@@ -4,7 +4,7 @@ mode: all
 permission:
   task: { "*": "allow" }
   edit: deny
-  bash: deny
+  shell: deny
 ---
 
 ## ⛔ ABSOLUTE RULE — READ BEFORE EVERY ACTION

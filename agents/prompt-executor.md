@@ -3,7 +3,7 @@ description: Executes a single prompt from a Meta-Architect build plan — runs 
 mode: subagent
 permission:
   edit: allow
-  bash: allow
+  shell: allow
   task: { "explore": "allow", "debugger": "allow", "web-search": "allow" }
 ---
 

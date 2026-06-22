@@ -7,7 +7,7 @@ permission:
   grep: allow
   list: allow
   edit: deny
-  bash:
+  shell:
     "git add *": "allow"
     "git commit *": "allow"
     "git status *": "allow"

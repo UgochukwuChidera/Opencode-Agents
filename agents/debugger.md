@@ -6,7 +6,7 @@ permission:
   glob: allow
   grep: allow
   edit: allow
-  bash: allow
+  shell: allow
   task:
     explorer: allow
     web-search: allow

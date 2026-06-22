@@ -3,7 +3,7 @@ description: Build plan writer — compiles all stage outputs into the final pla
 mode: subagent
 permission:
   read: allow
-  bash: allow
+  shell: allow
   edit: allow
   task: { "explore": "allow" }
 ---
@@ -85,7 +85,7 @@ Write a file at `.meta-architect/plan.json`. The JSON structure:
 
 ## Tool Awareness
 
-You have `bash: allow` for creating directories and writing files, and `edit: allow` for writing plan.json. Use dedicated tools for everything else:
+You have `shell: allow` for creating directories and writing files, and `edit: allow` for writing plan.json. Use dedicated tools for everything else:
 
 - `json` — format/validate your plan.json output
 

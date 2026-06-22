@@ -5,7 +5,7 @@ permission:
   read: allow
   glob: allow
   grep: allow
-  bash:
+  shell:
     "glob *": "allow"
     "ls *": "allow"
     "cat *": "allow"

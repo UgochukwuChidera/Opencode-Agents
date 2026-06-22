@@ -7,7 +7,7 @@ permission:
   grep: allow
   list: allow
   edit: deny
-  bash:
+  shell:
     "rg *": "allow"
     "find *": "allow"
     "wc *": "allow"
