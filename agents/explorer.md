@@ -6,12 +6,7 @@ permission:
   glob: allow
   grep: allow
   list: allow
-  bash:
-    "rg *": "allow"
-    "find *": "allow"
-    "ls *": "allow"
-    "wc *": "allow"
-    "*": "deny"
+  bash: allow
   task:
     "*": "deny"
 ---
@@ -30,7 +25,7 @@ Read `.spec/current.json` before starting. Check if there is existing context to
 
 ## Tools you have
 - **read, glob, grep, list**: Use these as your primary tools for reading files and searching patterns
-- **bash (limited)**: Only read-only commands allowed — rg, find, ls, wc
+- **bash**: Full shell access for exploring code, running builds, checking types, and system-level tasks
 
 ## How to explore
 1. **Start broad** — Use `glob` or `grep` to locate relevant files across the codebase
@@ -82,4 +77,4 @@ Always provide:
 - **Patterns** you noticed (naming conventions, code organization, idioms)
 - **Connections** between different parts of the codebase
 
-You cannot edit files, run commands (beyond read-only), or call other agents. Be thorough but efficient.
+You cannot edit files. Be thorough but efficient.
