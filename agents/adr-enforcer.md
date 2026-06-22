@@ -47,14 +47,17 @@ Before verifying, read `.spec/current.json` to find the ADRs to enforce. The spe
 ## Todowrite
 
 Before starting, declare work items:
-- `todowrite "Read spec for ADRs"`
+- `todowrite "Read ADRs from spec and docs/adrs/"`
 - `todowrite "Read implementation files"`
 - `todowrite "Check ADR compliance"`
 - `todowrite "Write violations to agent file"`
 
 ## Input
 
-ADRs are read from `.spec/current.json`. The spec should contain ADRs in its context or decisions:
+ADRs are read from two sources which are merged before enforcement:
+
+### Source 1: `.spec/current.json`
+The spec should contain ADRs in its context or decisions:
 ```json
 {
   "adrs": [
@@ -62,21 +65,29 @@ ADRs are read from `.spec/current.json`. The spec should contain ADRs in its con
       "number": 1,
       "title": "Use Prisma as ORM",
       "status": "active",
-      "rules": [
-        "No raw SQL queries",
-        "Use Prisma Client for all database access",
-        "Use Prisma Migrate for schema changes"
-      ]
+      "rules": [...]
     }
   ],
   "implementationPaths": ["src/routes/users.ts", "src/db/schema.ts"]
 }
 ```
 
+### Source 2: `docs/adrs/` directory
+Scan `docs/adrs/*.md` for additional ADR files. Parse each file's frontmatter or heading structure to extract:
+- ADR number (from filename or heading)
+- Title
+- Status (from ## Status section)
+- Context (from ## Context section)
+- Decision (from ## Decision section)
+
+Merge with Source 1. If conflicts exist between `.spec/current.json` ADRs and file ADRs:
+- `.spec/current.json` takes precedence (it's the active execution record)
+- Log a warning about the discrepancy
+
 ## Workflow
 
-### 1. Read Spec ADRs
-Load `.spec/current.json` to extract the ADRs that need enforcement.
+### 1. Read ADRs from Spec and docs/adrs/
+Load `.spec/current.json` and scan `docs/adrs/*.md` to extract all ADRs that need enforcement. Merge them, with `.spec/current.json` taking precedence.
 
 ### 2. Read Implementation (Parallel)
 Dispatch in parallel:

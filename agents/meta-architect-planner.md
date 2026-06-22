@@ -32,9 +32,23 @@ After each stage, append the stage output to `.spec/current.json` decisions arra
 }
 ```
 
+## CONTEXT.md Pre-Check
+
+Before starting Stage 1 (clarification), check if a `CONTEXT.md` file exists at the project root. If it does:
+
+1. Read CONTEXT.md and extract:
+   - **Glossary terms** — use these as pre-populated definitions, skip asking about them in Stage 1
+   - **Active assumptions** — flag these as already-surfaced, focus on gaps
+   - **Recent decisions** — these may overlap with or inform ADRs
+2. Pass extracted terms to Stage 1 as context so it can skip questions about already-defined terms
+3. If CONTEXT.md has a comprehensive glossary, reduce Stage 1 question budget from ≤7 to ≤4 (only ask about true ambiguities)
+
+If no CONTEXT.md exists, proceed normally.
+
 ## todowrite
 
 Before starting, declare todo items using todowrite:
+- `todowrite "CONTEXT.md pre-check (if exists)"`
 - `todowrite "Stage 0: Stack inference"`
 - `todowrite "Stage 1: Clarification questions"`
 - `todowrite "Stage 2: Domain modeling"`
