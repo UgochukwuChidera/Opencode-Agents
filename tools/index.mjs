@@ -22,7 +22,7 @@
 import { tool } from "@opencode-ai/plugin";
 
 // ─── Shell execution ───────────────────────────────────────────────
-import { bashTool, powershellTool } from "./bash-tool.mjs";
+import { bashTool } from "./bash-tool.mjs";
 
 // ─── Web tools ─────────────────────────────────────────────────────
 import { webSearchTool } from "./web-search.mjs";
@@ -181,9 +181,9 @@ import { planExecutorTool } from "./plan-executor.mjs";
  * Each key becomes the tool name visible to agents.
  */
 const toolDefinitions = {
-  // ── Shell ──
+  // ── Shell (unified — auto-detects OS) ──
   bash: bashTool,
-  powershell: powershellTool,
+  // NOTE: No separate "powershell" tool needed — bashTool auto-detects Windows
 
   // ── Web ──
   "web-search": webSearchTool,

@@ -26,8 +26,7 @@ Opencode-Agents/
 │   ├── ai-detector.mjs     # AI-generated text detection
 │   ├── ai-senior.mjs       # Senior AI detection aggregator
 │   ├── plan-executor.mjs   # Meta-Architect plan queue extraction
-│   ├── custom-tools.mjs    # Template for your own tools
-│   └── bash-mcp.mjs        # Bash MCP server (deprecated)
+│   └── custom-tools.mjs    # Template for your own tools
 ├── skills/         # Skill instructions auto-loaded by opencode
 │   ├── react-patterns/SKILL.md
 │   ├── error-handling/SKILL.md
@@ -249,15 +248,14 @@ This project is free software: you can redistribute it and/or modify it under th
 
 See the [LICENSE](LICENSE) file for the full GPL v3.0 text.
 
-## Tools (108 total)
+## Tools (107 total)
 
 Custom tools registered via the `@opencode-ai/plugin` SDK. Available to all agents after installing the plugin.
 
-### Shell & System (4)
+### Shell & System (3)
 | Tool | Description |
 |------|-------------|
-| **bash** | Execute shell commands with auto-detected shell |
-| **powershell** | PowerShell execution (Windows only) |
+| **bash** | THE unified shell tool — auto-detects OS (Linux→bash, macOS→zsh, Windows→pwsh/cmd), unified cross-platform execution |
 | **system-info** | OS, CPU, memory, uptime, environment |
 | **platform** | Quick platform detection |
 
