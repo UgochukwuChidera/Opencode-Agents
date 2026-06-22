@@ -63,6 +63,16 @@ Your agent output path is passed via `agent_output_path`. If not provided, use `
 }
 ```
 
+## Package Tracking
+
+If your task requires installing packages (npm install, pip install, cargo add, etc.):
+1. Record every package you install in `packages_installed` in your agent file
+2. Include both direct dependencies and dev dependencies
+3. Example: `"packages_installed": ["react-router-dom", "tailwindcss", "@types/node"]`
+4. This enables cleanup-agent to audit and prune unused packages post-operation
+5. If you're unsure if a package is needed — still record it. The cleanup-agent will verify.
+
+
 ## Hard Rules
 
 - **HARD RULE**: Never run `git add` or `git commit` yourself. After implementation, call `commit-crafter` to stage and commit.

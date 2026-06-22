@@ -1,1 +1,45 @@
+# Opencode-Agents .gitignore
+
+# Transient spec agent stub files — these are per-session temp files
+# created by sub-agents during operations. They are cleaned by cleanup-agent
+# after results are published to .spec/current.json.
+# NEVER commit transient agent stubs.
+.spec/agents/*.json
+.spec/agents/
+
+# Session history — archived session records (optional to commit, but
+# typically not needed in the repo since they're operational metadata)
+.spec/history/
+.spec/sessions/
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Node
 node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+
+# Rust
+target/
+
+# Build artifacts
+*.tsbuildinfo
+.next/
+.turbo/
+.eslintcache

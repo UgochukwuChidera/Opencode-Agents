@@ -109,3 +109,51 @@ After every action, check:
 - [ ] If in "❌ NOT my Job" column → did I delegate?
 - [ ] Did I read `.spec/current.json` first?
 - [ ] Did I update `.spec/current.json` after?
+
+## Cross-Platform OS Adaptation
+
+Every agent MUST detect the operating system before running any command. The OS context is stored in `.spec/current.json` under `session.os`.
+
+### OS Detection Step
+
+Insert this between Step 1 (READ) and Step 2 (CLASSIFY) of the pre-flight loop:
+
+```
+1.5. DETECT OS → check .spec/current.json.session.os
+     - If not set → run `platform` or `system-info` tool to detect
+     - Set os.platform (linux|win32|darwin), os.arch, os.shell
+     - Update `.spec/current.json` with the OS info
+     - Agents read this to adapt commands
+```
+
+### Command Adaptation Rules
+
+| OS | Shell | Path Style | File Delete | Recursive Delete | Search | Package Manager |
+|---|---|---|---|---|---|---|
+| Linux | bash | `/home/user/` | `rm file` | `rm -rf dir/` | `grep` | apt / npm |
+| macOS | zsh | `/Users/user/` | `rm file` | `rm -rf dir/` | `grep` | brew / npm |
+| Windows (cmd) | cmd.exe | `C:\Users\` | `del file` | `rmdir /s /q dir` | `findstr` | choco / npm |
+| Windows (pwsh) | pwsh | `C:\Users\` | `Remove-Item` | `Remove-Item -Recurse` | `Select-String` | winget / npm |
+| Git Bash | bash | `C:/Users/` | `rm file` | `rm -rf dir/` | `grep` | npm |
+
+### Practical Rules for Agents
+
+1. **Before running ANY shell command**, check `session.os.platform`:
+   - `"linux"` or `"darwin"` → use bash syntax (rm, grep, /paths/)
+   - `"win32"` with shell `"powershell"` → use PowerShell syntax
+   - `"win32"` with shell `"cmd"` → use cmd.exe syntax (del, findstr, \paths\)
+
+2. **File paths**: always use forward slashes in agent code; convert only when running shell commands.
+
+3. **Cross-platform npm commands**: `npm`, `npx`, `node` work identically on all platforms.
+
+4. **If in doubt**: use the `platform` tool to detect the current OS before acting.
+
+### First-Run OS Seed
+
+The very first action in any session should be:
+1. Call `platform` tool → get OS info
+2. Write it to `.spec/current.json` → `session.os = { platform, arch, shell }`
+3. All subsequent agents read this from the spec
+
+This ensures every agent knows the OS before running any command.

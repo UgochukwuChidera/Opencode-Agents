@@ -42,9 +42,12 @@ Opencode-Agents/
 │   ├── authentication-authorization/SKILL.md # ← NEW
 │   └── deployment-devops/SKILL.md           # ← NEW
 ├── .spec/          # Spec-First state management (tracking + concurrency)
-│   ├── schema.json           # Canonical schema for current.json + agent files
+│   ├── schema.json           # Canonical schema v2.0 — session, cleanup, lifecycle
 │   ├── current.json          # Canonical read-only context — only coordinator writes
-│   └── agents/               # Per-agent output files (parallel-safe writes)
+│   ├── agents/               # Per-agent output files (parallel-safe writes, gitignored)
+│   └── history/              # Archived session records after cleanup (gitignored)
+├── LICENSE          # GNU General Public License v3.0
+├── .gitignore       # Excludes spec stubs, caches, build artifacts
 ├── setup.sh        # Linux/macOS setup script
 ├── setup.bat       # Windows setup script
 └── README.md       # This file
@@ -183,6 +186,68 @@ Simple commits → `commit-crafter`
 Complex workflows (merge, rebase, push, conflict resolution) → `git-wrangler`
 
 Every non-git agent has this rule prominently stated in its definition. The entry-point orchestrator (`meta-architect-orchestrator`) has `edit: deny` and `bash: deny` — it physically cannot write files or run commands.
+
+## Cross-Platform OS Adaptation
+
+Every agent now detects the operating system before running commands. The OS context is stored in `.spec/current.json` under `session.os`.
+
+### OS Detection (Step 1.5 of Pre-Flight)
+
+Between READ and CLASSIFY in the pre-flight loop, agents check `session.os.platform`:
+- Not set → run `platform` tool → persist to `.spec/current.json`
+- Set → adapt commands to the detected OS
+
+### Adapted Commands Per OS
+
+| OS | Shell | Path Style | Delete | Recursive Delete | Search |
+|---|---|---|---|---|---|
+| Linux | bash | `/home/` | `rm file` | `rm -rf dir/` | `grep` |
+| macOS | zsh | `/Users/` | `rm file` | `rm -rf dir/` | `grep` |
+| Windows (cmd) | cmd.exe | `C:\Users\` | `del file` | `rmdir /s /q dir` | `findstr` |
+| Windows (pwsh) | pwsh | `C:\Users\` | `Remove-Item` | `Remove-Item -Recurse` | `Select-String` |
+| Git Bash | bash | `C:/Users/` | `rm file` | `rm -rf dir/` | `grep` |
+
+This ensures tool calls and shell commands work regardless of the host OS. The `pre-flight-protocol` skill includes full cross-platform tables.
+
+## Session & Cleanup Lifecycle
+
+The complete lifecycle of a multi-agent operation:
+
+```
+create_session → dispatch_agents → agents_write_agent_files → 
+coordinator_merge → coordinator_publish(current.json) → 
+dispatch_cleanup → cleanup-agent_removes_stubs → 
+archive_session_to_history
+```
+
+### Session Tracking
+
+Each operation gets a unique `session.id` in `.spec/current.json`:
+- `session.work_items_total` — set by coordinator when work is dispatched
+- `session.work_items_completed` — incremented as agents finish
+- `session.phase` — transitions: `planning → execution → cleanup → complete`
+
+Coordinators (`meta-architect-executor`, `orchestrator`) populate these fields during merge steps.
+
+### Package Tracking
+
+Code-writing agents (`executor`, `creator`, `prompt-executor`) now record every package they install in their agent file under `packages_installed`. The `cleanup-agent` reads these after operations complete, checks if each package is actually imported in the source code, and removes unused ones.
+
+### Session History Archival
+
+After cleanup completes, the `cleanup-agent` archives a session record to `.spec/history/{session_id}.json` containing:
+- Session metadata (start/end time, description)
+- Agent count and types used
+- Files created, packages installed/removed
+- Space freed
+
+This directory is in `.gitignore` — it's operational metadata for audit trail, not source code.
+
+## License
+
+This project is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+See the [LICENSE](LICENSE) file for the full GPL v3.0 text.
 
 ## Tools (108 total)
 

@@ -152,14 +152,45 @@ __pycache__/
 
 When called for full cleanup:
 
-1. READ `.spec/current.json` for session context
+1. READ `.spec/current.json` for session context (session.id, session.phase)
 2. Dry-run: scan agent stubs, unused packages, waste directories → REPORT
 3. Wait for confirmation (or `dry_run=false` flag)
-4. Execute: remove agent stubs
-5. Execute: prune unused packages
-6. Execute: clean waste directories
-7. Write cleanup results to `.spec/agents/cleanup-{session_id}.json`
-8. Report summary with total space freed
+4. Execute: remove agent stubs from `.spec/agents/`
+5. Execute: prune unused packages (npm/pip/cargo)
+6. Execute: clean waste directories (cache, build artifacts)
+7. Archive session record to `.spec/history/{session_id}.json`:
+   - Copy session metadata from `.spec/current.json`
+   - Add cleanup results (files_removed, packages_removed, space_freed)
+   - Set session status to "cleaned"
+8. Update `.spec/current.json`:
+   - Set `session.phase` to "complete"
+   - Set `status` to "complete"
+   - Record cleanup results under `cleanup` key
+9. Write cleanup agent results to `.spec/agents/cleanup-{session_id}.json`
+10. Report summary with total space freed
+
+## Session Archiving
+
+After cleanup completes, archive the session record to `.spec/history/{session_id}.json`:
+
+```json
+{
+  "session_id": "uuid-from-current-json",
+  "start_time": "ISO 8601",
+  "end_time": "ISO 8601",
+  "description": "What operation this session performed",
+  "agent_count": 5,
+  "agents_used": ["executor", "historian", "commit-crafter"],
+  "files_created": 12,
+  "packages_installed": ["react-router-dom"],
+  "packages_removed": ["left-pad"],
+  "files_removed": 15,
+  "space_freed_bytes": 409600,
+  "status": "cleaned"
+}
+```
+
+The archived session is purely informational — it's not read by any agent. It exists for human audit trail and debugging.
 
 ## SELF-AUDIT
 
