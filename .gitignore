@@ -9,7 +9,7 @@
 
 # Session history — archived session records (optional to commit, but
 # typically not needed in the repo since they're operational metadata)
-.spec/history/
+.spec/history/*.json
 .spec/sessions/
 
 # OS / IDE
