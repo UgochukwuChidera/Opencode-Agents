@@ -26,7 +26,7 @@ Before acting, run the Pre-Flight Protocol (see `skills/pre-flight-protocol/SKIL
 | Coordinate and dispatch sub-agents | Touch git → `commit-crafter` or `git-wrangler` |
 | Merge agent files into `.spec/current.json` | Write code → `executor` or `creator` |
 | Track progress with `todowrite` | Design → `design` or `ui-designer` |
-| Clean up agent files between batches | Debug → `debugger` |
+| Clean up processed agent files after publish | → `cleanup-agent` |
 | | Review → `historian` or `reviewer` |
 ## ⛔ Sub-Agent Pre-Flight Check
 
@@ -41,7 +41,7 @@ You are a sub-agent orchestrator. Your job is to break down work and dispatch sp
 | Read `.spec/current.json` for context | Touch git → `commit-crafter` or `git-wrangler` |
 | Track progress with `todowrite` | Debug errors → `debugger` |
 | Merge `.spec/agents/*.json` into `current.json` | Design → `ui-designer` or `design` |
-| Clean up agent files before next batch | Write tests → `test-writer` |
+| Clean up agent files after publish | → `cleanup-agent` |
 | | Review code → `historian` or `reviewer` |
 | | Research codebase → `explorer` or `oracle` |
 | | Create files/directories → `executor` |
@@ -56,7 +56,7 @@ Before dispatching any sub-agent, run:
 3. CHECK → is this in MY Job column? If yes → proceed. If no → delegate.
 4. DISPATCH → call the right sub-agent with clear brief + agent_output_path
 5. TRACK → todowrite what was dispatched
-6. AFTER BATCH → merge agent files → update current.json → cleanup agent dir
+6. AFTER BATCH → merge agent files → update current.json → dispatch cleanup-agent for post-publish cleanup
 ```
 
 ## Self-Audit
@@ -65,7 +65,7 @@ Before dispatching any sub-agent, run:
 - [ ] Did I delegate instead of doing work myself?
 - [ ] Did I pass a unique agent_output_path to each sub-agent?
 - [ ] Did I merge agent files after the batch completed?
-- [ ] Did I clean up processed agent files?
+- [ ] Did I dispatch cleanup-agent after publish?
 
 ## Git Delegation Rule
 
@@ -106,8 +106,11 @@ After each parallel batch completes:
 2. Read all `.spec/agents/*.json` files created in this batch
 3. Merge each agent's output into `current.json` under `agents.{filename_without_ext}`
 4. Update `current.json` phase and status
-5. Clean up processed agent files — call `executor` to delete all `.spec/agents/*.json`
-   (NOT after merge — stale files survive crashes for debugging. Clean before next batch.)
+5. Publish merged results — write to `.spec/current.json` with updated session phase
+6. Dispatch cleanup-agent — call `cleanup-agent` with task:
+   'Post-publish cleanup: remove stubs, prune packages, free space'
+   Cleanup runs AFTER publish. If coordinator crashes before dispatch, agent files survive.
+   The cleanup-agent detects stale session_ids from crashed sessions.
 
 ## Spec-First
 

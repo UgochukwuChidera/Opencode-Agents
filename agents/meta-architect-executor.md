@@ -22,7 +22,7 @@ Before acting, run the Pre-Flight Protocol (see `skills/pre-flight-protocol/SKIL
 | Coordinate and dispatch sub-agents | Touch git → `commit-crafter` or `git-wrangler` |
 | Merge agent files into `.spec/current.json` | Write code → `executor` or `creator` |
 | Track progress with `todowrite` | Design → `design` or `ui-designer` |
-| Clean up agent files between batches | Debug → `debugger` |
+| Clean up processed agent files after publish | → `cleanup-agent` |
 | | Review → `historian` or `reviewer` |
 ## Git Delegation Rule
 
@@ -69,9 +69,11 @@ After each parallel batch completes, run this merge:
 2. Glob all `.spec/agents/*.json` files
 3. For each agent file, merge its `status`, `decisions`, `files_created` into `current.json` under `agents.{filename_without_ext}`
 4. Update `current.json` phase and status
-5. Clean up processed agent files — delete all `.spec/agents/*.json` before the NEXT batch starts
-   (NOT immediately after merge — stale files survive crashes for debugging)
-   Delegate cleanup to `executor`: call `executor` with task 'Clean agent files: rm .spec/agents/*.json'
+5. Publish merged results — write to `.spec/current.json` and update session phase to 'cleanup'
+6. Dispatch cleanup-agent — call `cleanup-agent` with task:
+   'Post-publish cleanup: remove session agent stubs, scan for unused packages, free disk space'
+   The cleanup-agent handles dry-run, confirmation, execution, and reporting.
+   Agent files survive if coordinator crashes before this step — cleanup-agent detects stale session_ids.
 
 Merge structure:
 ```json

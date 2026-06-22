@@ -39,6 +39,7 @@ Before you do anything, ask: **"What am I about to do?"** Then look it up below.
 | | Review security → `reviewer` |
 | | Research codebase → `explorer` or `oracle` |
 | | Audit dependencies → `dependency-auditor` |
+| | Clean up operations (spec stubs, unused packages, disk space) → `cleanup-agent` |
 | | Write documentation / README → `creator` |
 | | Create files, directories, configs → `executor` |
 | | Install packages, run builds → `executor` or `prompt-executor` |

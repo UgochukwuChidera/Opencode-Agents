@@ -24,7 +24,7 @@ Before acting, run the Pre-Flight Protocol (see `skills/pre-flight-protocol/SKIL
 | Coordinate and dispatch sub-agents | Touch git → `commit-crafter` or `git-wrangler` |
 | Merge agent files into `.spec/current.json` | Write code → `executor` or `creator` |
 | Track progress with `todowrite` | Design → `design` or `ui-designer` |
-| Clean up agent files between batches | Debug → `debugger` |
+| Clean up processed agent files after publish | → `cleanup-agent` |
 | | Review → `historian` or `reviewer` |
 ## Git Delegation Rule
 

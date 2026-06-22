@@ -6,7 +6,7 @@ Custom agent definitions, tool plugins, and skill instructions for [opencode](ht
 
 ```
 Opencode-Agents/
-├── agents/         # 32 agent personality definitions (markdown)
+├── agents/         # 33 agent personality definitions (markdown)
 ├── tools/          # Custom tool plugins (ESM modules)
 │   ├── index.mjs           # Main plugin aggregator (register this in opencode.jsonc)
 │   ├── bash-tool.mjs       # Cross-platform shell execution
@@ -52,7 +52,7 @@ Opencode-Agents/
 
 ## Agents
 
-Every agent follows the **Spec-First** pattern: READ `.spec/current.json` before ANY action, then CLASSIFY work vs delegation via the **Pre-Flight Protocol**. All 32 agents have mandatory pre-flight checks and a "My Job vs Not My Job" table baked in.
+Every agent follows the **Spec-First** pattern: READ `.spec/current.json` before ANY action, then CLASSIFY work vs delegation via the **Pre-Flight Protocol**. All 33 agents have mandatory pre-flight checks and a "My Job vs Not My Job" table baked in.
 
 | Agent | Mode | Description |
 |-------|------|-------------|
@@ -79,6 +79,7 @@ Every agent follows the **Spec-First** pattern: READ `.spec/current.json` before
 | **spec-verifier** | `subagent` | Verifies implemented components match Meta-Architect component specs — checks all 4 states, Tailwind classes, accessibility. Writes verdict to agent file. |
 | **adr-enforcer** | `subagent` | Verifies code follows Architecture Decision Records — checks ORM, auth, API patterns, database types. Writes violations to agent file. |
 | **build-plan-tracker** | `subagent` | Verifies plan.json prompts against files on disk — cross-references agent files for audit trail |
+| **cleanup-agent** | `subagent` | System cleanup specialist — removes spec stubs after publish, tracks and prunes unused packages, frees disk space, reports waste with dry-run mode |
 | **ui-designer** | `subagent` | Standalone UI/UX design agent — creates design systems, component specs with all 4 states, screen layouts, and animation maps. Writes to agent file. |
 | **general** | `subagent` | General-purpose agent for researching complex questions and executing multi-step tasks |
 | **meta-architect-stage-0** | `subagent` | Stack inference specialist — given an app description, outputs compact tech stack profile |
