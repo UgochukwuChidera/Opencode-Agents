@@ -73,6 +73,36 @@ else
   echo "  ⚠️  No .spec/ directory at $SPEC_TARGET — skipping"
 fi
 
+# ── Bootstrap .spec/current.json ──────────────────────────────────
+CURRENT_JSON="$SPEC_TARGET/current.json"
+if [[ ! -f "$CURRENT_JSON" ]]; then
+  echo "  Creating bootstrap .spec/current.json..."
+  cat > "$CURRENT_JSON" <<JSON
+{
+  "status": "planned",
+  "session": {
+    "id": "00000000-0000-0000-0000-000000000000",
+    "start_time": "$(date -u +%Y-%m-%dT%H:%M:%S.000Z)",
+    "phase": "complete",
+    "description": "Bootstrap session — no active operation. Created by setup to enable cleanup lifecycle.",
+    "work_items_total": 0,
+    "work_items_completed": 0
+  },
+  "phase": "idle",
+  "cleanup": {
+    "last_cleanup_time": "$(date -u +%Y-%m-%dT%H:%M:%S.000Z)",
+    "files_removed": 0,
+    "packages_removed": [],
+    "space_freed_bytes": 0,
+    "space_freed_human": "0 B"
+  }
+}
+JSON
+  echo "  ✅ .spec/current.json created"
+else
+  echo "  ✅ .spec/current.json already exists"
+fi
+
 # ── Register plugin in opencode.jsonc ─────────────────────────────
 PLUGIN_PATH="./tools/index.mjs"
 JSONC_FILE="$OPENCODE_CONFIG_DIR/opencode.jsonc"

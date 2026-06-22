@@ -1,0 +1,19 @@
+{
+  "status": "planned",
+  "session": {
+    "id": "00000000-0000-0000-0000-000000000000",
+    "start_time": "2026-06-22T00:00:00.000Z",
+    "phase": "complete",
+    "description": "Bootstrap session — no active operation. Created by setup to enable cleanup lifecycle.",
+    "work_items_total": 0,
+    "work_items_completed": 0
+  },
+  "phase": "idle",
+  "cleanup": {
+    "last_cleanup_time": "2026-06-22T00:00:00.000Z",
+    "files_removed": 0,
+    "packages_removed": [],
+    "space_freed_bytes": 0,
+    "space_freed_human": "0 B"
+  }
+}

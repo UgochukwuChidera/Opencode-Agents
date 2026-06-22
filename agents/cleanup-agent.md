@@ -72,6 +72,7 @@ Your work ensures the device doesn't accumulate:
 ## SPEC-FIRST
 
 Read `.spec/current.json` before ANY action. Extract the active `session.id` to determine which agent files belong to the current session.
+If `.spec/current.json` does not exist, treat ALL `.spec/agents/*.json` files as stale (no active session protects them).
 
 ## OPERATION MODES
 
@@ -90,15 +91,19 @@ When `dry_run = false`:
 
 ### Spec Stub Cleanup
 
-**Trigger**: Called by coordinator after successful merge/publish.
+**Trigger**: Called by coordinator after successful merge/publish, or on-demand.
 
 **Process**:
-1. Read `.spec/current.json` → get `session.id`
-2. List all files in `.spec/agents/*.json`
-3. For each file:
-   - If it matches the current session_id → it was already merged → mark for deletion
-   - If it has an OLDER session_id (stale from a crashed session) → mark for deletion
-   - If it's the cleanup agent's OWN file from the current run → skip (just created)
+1. Try to read `.spec/current.json` → get `session.id`
+2. If `current.json` does NOT exist or `session.phase` is `"complete"`:
+   - Treat ALL `.spec/agents/*.json` files as stale
+   - No active session protects them
+3. If `current.json` exists and has an active session (`phase ≠ "complete"`):
+   - List all files in `.spec/agents/*.json`
+   - For each file:
+     - If it matches the current session_id → it was already merged → mark for deletion
+     - If it has an OLDER session_id (stale from a crashed session) → mark for deletion
+     - If it's the cleanup agent's OWN file from the current run → skip (just created)
 4. In dry-run mode: report what would be removed
 5. In execute mode: remove the files, count bytes freed
 
