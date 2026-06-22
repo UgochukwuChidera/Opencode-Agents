@@ -106,6 +106,10 @@ STEP 5: TRACK with todowrite
 
 STEP 6: After completion → update .spec/current.json
   └─ Mark work items, log decisions, update phase
+
+STEP 7: ALWAYS dispatch cleanup-agent after work completes
+  └─ Call cleanup-agent to remove stale .spec/agents/*.json files
+  └─ These are session files — DESTROY them when done, NEVER leave them
 ```
 
 ---
@@ -132,6 +136,7 @@ Before responding to the user, check EVERY box:
 - [ ] If I touched git — **why?** I should have delegated to commit-crafter/git-wrangler.
 - [ ] Did I read `.spec/current.json` before starting?
 - [ ] Did I update `.spec/current.json` after finishing?
+- [ ] Did I dispatch `cleanup-agent` to remove stale `.spec/agents/*.json` files?
 - [ ] Is there an agent in the table that could do this instead of me?
 
 **If any answer is "I did it myself" → you broke the rules. Apologize and redo it properly.**

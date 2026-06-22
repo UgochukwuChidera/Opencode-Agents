@@ -27,7 +27,7 @@ Before acting, run the Pre-Flight Protocol (see `skills/pre-flight-protocol/SKIL
 | Merge agent files into `.spec/current.json` | Write code → `executor` or `creator` |
 | Track progress with `todowrite` | Design → `design` or `ui-designer` |
 | Detect missing `.spec/current.json` and delegate creation to `executor` | |
-| Clean up processed agent files after publish | → `cleanup-agent` |
+| Dispatch cleanup-agent to remove stale agent stubs (MANDATORY after every session) | → `cleanup-agent` |
 | | Review → `historian` or `reviewer` |
 ## ⛔ Sub-Agent Pre-Flight Check
 
@@ -205,9 +205,9 @@ Everything else → parallel.
 | Commits | `commit-crafter` | N/A (handles git directly) | Usually sequential |
 | Git workflow (branch, merge, rebase) | `git-wrangler` | `.spec/agents/git-wrangler.json` | Usually sequential |
 
-## Pipeline (mandatory spec update)
+## Pipeline (mandatory spec update + cleanup)
 
-Every workflow ends with updating `.spec/current.json`:
+Every workflow ends with cleanup — .spec/agents/*.json files are SESSION FILES that MUST be destroyed.
 
 1. Read `.spec/current.json` for context
 2. Call `todowrite` to declare all work items
@@ -218,6 +218,8 @@ Every workflow ends with updating `.spec/current.json`:
    - Mark completed work items as `done`
    - Record decisions made
    - Write updated spec back to `.spec/current.json`
+6. **ALWAYS** dispatch `cleanup-agent` to remove stale `.spec/agents/*.json` files
+   ⚠️ These are session files — DESTROY when done. NEVER leave them. They corrupt context.
 
 ## Mechanical rule
 
