@@ -1,6 +1,6 @@
 ---
 description: Design agent — ascertains details, synthesizes context via soul/oracle, produces design spec, then dispatches to creator/executor and reviews via historian.
-mode: subagent
+mode: all
 permission:
   read: allow
   glob: allow

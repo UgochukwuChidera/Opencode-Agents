@@ -1,6 +1,6 @@
 ---
 description: Breaks down tasks, delegates to specialist sub-agents in parallel, tracks progress via specs and todos.
-mode: subagent
+mode: all
 permission:
   read: allow
   glob: allow
