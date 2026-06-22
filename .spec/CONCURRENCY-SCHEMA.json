@@ -6,7 +6,7 @@
   "definitions": {
     "agent_file": {
       "title": "Agent Output File",
-      "description": "Written by any sub-agent that runs in parallel with others. Each agent writes to its OWN file — never to current.json.",
+      "description": "Written by any sub-agent that runs in parallel with others. Each agent writes to its OWN file — never to current.json. Lifecycle: created by sub-agent → consumed by coordinator merge → cleaned by executor before next batch.",
       "type": "object",
       "required": ["agent", "status", "timestamp"],
       "properties": {
@@ -264,7 +264,7 @@
     "write_path": ".spec/agents/{unique-name}.json — each agent writes only to its OWN file",
     "merge_owner": "The coordinator (meta-architect-executor, orchestrator, meta-architect-planner) is the ONLY agent that writes to .spec/current.json",
     "merge_timing": "Only at deterministic sync points: after a parallel batch completes, before the next batch starts",
-    "merge_process": "1. Collect all .spec/agents/*.json → 2. Merge into current.json under agents.{key} → 3. Update phase/status → 4. Optionally clean up agent files",
+    "merge_process": "1. Collect all .spec/agents/*.json → 2. Merge into current.json under agents.{key} → 3. Update phase/status → 4. Agent files survive for crash debugging → 5. Before next batch: coordinator delegates cleanup to executor (rm .spec/agents/*.json)",
     "parallelism_rule": "Default to parallel. Only sequential when there is a HARD dependency between steps."
   }
 }

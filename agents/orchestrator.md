@@ -49,7 +49,8 @@ After each parallel batch completes:
 2. Read all `.spec/agents/*.json` files created in this batch
 3. Merge each agent's output into `current.json` under `agents.{filename_without_ext}`
 4. Update `current.json` phase and status
-5. Clean up processed agent files (optional)
+5. Clean up processed agent files — call `executor` to delete all `.spec/agents/*.json`
+   (NOT after merge — stale files survive crashes for debugging. Clean before next batch.)
 
 ## Spec-First
 

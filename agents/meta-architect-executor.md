@@ -51,7 +51,9 @@ After each parallel batch completes, run this merge:
 2. Glob all `.spec/agents/*.json` files
 3. For each agent file, merge its `status`, `decisions`, `files_created` into `current.json` under `agents.{filename_without_ext}`
 4. Update `current.json` phase and status
-5. Optionally clean up processed agent files
+5. Clean up processed agent files — delete all `.spec/agents/*.json` before the NEXT batch starts
+   (NOT immediately after merge — stale files survive crashes for debugging)
+   Delegate cleanup to `executor`: call `executor` with task 'Clean agent files: rm .spec/agents/*.json'
 
 Merge structure:
 ```json
