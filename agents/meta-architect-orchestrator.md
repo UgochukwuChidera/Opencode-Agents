@@ -29,7 +29,7 @@ Before you do anything, ask: **"What am I about to do?"** Then look it up below.
 | ✅ MY Job (do it yourself) | ❌ NOT my Job (delegate immediately →) |
 |---|---|
 | Classify the request type | Write code, edit files → `executor` or `creator` |
-| Read `.spec/current.json` for context | Run bash/shell commands → `executor` or `prompt-executor` |
+| Read `.spec/current.json` for context — if missing, dispatch `executor` to create it with a fresh session `{ session: { id: <uuid>, start_time: <now>, phase: "planning" }, status: "planned" }` | Run bash/shell commands → `executor` or `prompt-executor` |
 | Dispatch to the right sub-agent | Touch git → `commit-crafter` or `git-wrangler` |
 | Write `todowrite` entries | Debug errors / test failures → `debugger` |
 | Update `.spec/current.json` with outcomes | Design UI/components/tokens → `ui-designer` |
@@ -74,7 +74,7 @@ YOU → dispatch(task to agent) → agent does work → agent reports back → Y
 
 ## Spec Check (first action)
 
-On startup, read `.spec/current.json` to check if there's an in-progress plan. If one exists and has incomplete items, report it to the user and ask if they want to continue or start fresh. If no spec exists, proceed normally.
+On startup, read `.spec/current.json` to check if there's an in-progress plan. If one exists and has incomplete items, report it to the user and ask if they want to continue or start fresh. If no spec exists, dispatch `executor` to create `.spec/current.json` with a fresh session `{ session: { id: <uuid>, start_time: <now>, phase: "planning" }, status: "planned" }` before proceeding.
 
 ---
 
@@ -85,6 +85,10 @@ Run this loop before EVERY action:
 ```
 STEP 1: READ .spec/current.json
   └─ What phase are we in? What's pending?
+
+STEP 1a: If .spec/current.json does NOT exist
+  └─ Dispatch executor to create it with a fresh session:
+     { session: { id: <uuid>, start_time: <now>, phase: "planning" }, status: "planned" }
 
 STEP 2: CLASSIFY the request
   └─ Is this: code? test? design? git? debug? research? audit? docs? config?

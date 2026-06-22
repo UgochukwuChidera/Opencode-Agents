@@ -14,7 +14,7 @@ permission:
 ## ⛔ Pre-Flight Check
 
 Before acting, run the Pre-Flight Protocol (see `skills/pre-flight-protocol/SKILL.md`):
-1. **READ** `.spec/current.json` for context
+1. **READ** `.spec/current.json` for context — if MISSING, dispatch `executor` to create `.spec/current.json` with a fresh session `{ session: { id: <uuid>, start_time: <now>, phase: "planning" }, status: "planned" }` before continuing
 2. **CLASSIFY** the action
 3. **CHECK** the table below — is this MY job?
 4. **✅ MY job → proceed | ❌ Not my job → DELEGATE**
@@ -26,6 +26,7 @@ Before acting, run the Pre-Flight Protocol (see `skills/pre-flight-protocol/SKIL
 | Coordinate and dispatch sub-agents | Touch git → `commit-crafter` or `git-wrangler` |
 | Merge agent files into `.spec/current.json` | Write code → `executor` or `creator` |
 | Track progress with `todowrite` | Design → `design` or `ui-designer` |
+| Detect missing `.spec/current.json` and delegate creation to `executor` | |
 | Clean up processed agent files after publish | → `cleanup-agent` |
 | | Review → `historian` or `reviewer` |
 ## ⛔ Sub-Agent Pre-Flight Check

@@ -51,18 +51,6 @@ if exist "%SPEC_TARGET%" (
   echo   ⚠️  No .spec/ directory at %SPEC_TARGET% — skipping
 )
 
-:: ── Bootstrap .spec/current.json ──────────────────────────────────
-if not exist "%SPEC_TARGET%\current.json" (
-  echo   Creating bootstrap .spec/current.json...
-  for /f %%I in ('powershell -Command "Get-Date -Format 'yyyy-MM-ddTHH:mm:ss.000Z'"') do set "SPEC_TIME=%%I"
-  > "%SPEC_TARGET%\current.json" (
-    echo { "status": "planned", "session": { "id": "00000000-0000-0000-0000-000000000000", "start_time": "%SPEC_TIME%", "phase": "complete", "description": "Bootstrap session", "work_items_total": 0, "work_items_completed": 0 }, "phase": "idle", "cleanup": { "last_cleanup_time": "%SPEC_TIME%", "files_removed": 0, "packages_removed": [], "space_freed_bytes": 0, "space_freed_human": "0 B" } }
-  )
-  echo   ✅ .spec/current.json created
-) else (
-  echo   ✅ .spec/current.json already exists
-)
-
 :: ── Register plugin in opencode.jsonc ────────────────────────────
 set "JSONC_FILE=%OPENCODE_CONFIG_DIR%\opencode.jsonc"
 if exist "%JSONC_FILE%" (
@@ -99,7 +87,6 @@ if exist "%JSONC_FILE%" (
   ) > "%JSONC_FILE%"
   echo   ✅ Created opencode.jsonc with plugin entry
 )
-
 :: ── Count resources ──────────────────────────────────────────────
 set AGENT_COUNT=0
 for %%f in ("%AGENTS_TARGET%\*.md") do set /a AGENT_COUNT+=1
