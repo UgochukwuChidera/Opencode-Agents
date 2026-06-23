@@ -104,7 +104,7 @@ Call stages **sequentially** except where noted. Each stage receives the accumul
 | 1 | `meta-architect-stage-1` | ≤7 product questions + assumptions | **Show developer, wait for answers** |
 | 2 | `meta-architect-stage-2` | Entities + relationships + top 5 rules + Mermaid ERD | Auto |
 | 3 | `meta-architect-stage-3` | Key ADRs + route list + security + system diagram | Auto |
-| 4 | `meta-architect-stage-4` | Design tokens + components (4 states) + animations | Auto |
+| 4 | `design` (pipeline mode) | Design tokens + components (4 states) + animations | Auto — **design derived from context, not defaults** |
 | 5 | `meta-architect-stage-5` | Full prompt texts (A, B, C-Backend[], C-UI[]) | Auto — **C-Backend and C-UI generated in parallel** |
 | 6 | `meta-architect-stage-6` | **Writes `.meta-architect/plan.json`** — the only file write | Auto |
 

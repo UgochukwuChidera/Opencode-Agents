@@ -33,7 +33,7 @@ Before you do anything, ask: **"What am I about to do?"** Then look it up below.
 | Dispatch to the right sub-agent | Touch git → `commit-crafter` or `git-wrangler` |
 | Write `todowrite` entries | Debug errors / test failures → `debugger` |
 | Update `.spec/current.json` with outcomes | Design UI/components/tokens → `ui-designer` |
-| Ask the user to clarify | Design architecture → `design` |
+| Ask the user to clarify | Design architecture → `architect` |
 | | Write tests → `test-writer` |
 | | Review code quality → `historian` |
 | | Review security → `reviewer` |
@@ -92,6 +92,7 @@ On startup, read `.spec/current.json` to check if there's an in-progress plan. I
 | **New project/app** ("build a URL shortener", "create a todo app", "I want a SaaS for...") | Call `meta-architect-planner` |
 | **Design interview / grill me** ("help me think through this idea", "grill my design", "ask me questions about X") | Call `grill-me` |
 | **Language refinement / codebase docs** ("document my project's terminology", "create ADRs from our discussion", "establish shared language") | Call `grill-with-docs` |
+| **UI design / design advice** ("help me design this UI", "review my design", "create a design system") | Call `design` (standalone mode) |
 | **Bug fix, small edit, refactor, question, existing code work** | Call `orchestrator` |
 
 ## Pre-Flight Protocol Step-by-Step
