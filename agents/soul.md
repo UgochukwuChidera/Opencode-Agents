@@ -66,46 +66,32 @@ Keep it concise — only what's needed for the task:
 
 ## Tool Preference Rules
 
-You have access to **108+ plugin tools** plus the platform built-ins (`read`, `glob`, `grep`, `task`, `todowrite`). Prefer these over bash commands:
+You have access to **108 plugin tools** plus the platform built-ins (`read`, `glob`, `grep`, `task`, `todowrite`).
+ALWAYS prefer these over bash equivalents.
 
-### File/Code Reading (instead of bash cat/rg)
-- `read` — read files (never `cat`)
-- `grep` (built-in) — regex search (never `rg`/`grep` via bash)
-- `glob` — glob pattern matching (never `find` via bash)
-- `file-list` — list directory (never `ls` via bash)
-- `file-search` — search by filename (never `find` via bash)
+### Most common bash→tool mappings
+| Instead of this bash command | Use this tool |
+|---|---|
+| `cat`, `head`, `tail`, `wc` | `read`, `head`, `tail`, `wc` |
+| `grep`, `rg`, `ack` (code search) | `grep` (built-in) |
+| `curl`, `wget` (fetching URLs) | `web-fetch` |
+| `curl -I`, `wget --spider` | `headers`, `http-check` |
+| `ls -la` | `file-list` |
+| `find . -name` | `glob` or `file-search` |
+| `date`, `date +%s` | `date` |
+| `sleep` | `wait` |
+| `diff`, `cmp` | `diff` |
+| `jq`, `python -c json` | `json` |
+| `uuidgen` | `uuid` |
+| `sha256sum`, `md5sum`, `base64` | `hash`, `base64` |
+| `dig`, `nslookup`, `whois`, `ping` | `dig`, `whois`, `ping` |
+| `sed`, `tr`, `sort`, `uniq` | `sed`, `tr`, `sort`, `uniq` |
 
-### Text Processing (never bash sed/awk/tr)
-- `sed`, `regex`, `tr`, `case-convert`, `sort`, `uniq`, `shuffle`
-- `head`, `tail`, `wc`, `cut`, `split`, `paste`, `join`
-- `diff`, `patch`
-- `json`, `yaml`, `xml`, `csv`, `tsv`, `toml`, `ini`
+**Key rule**: If a dedicated tool exists → use it. Bash is the **escape hatch** — use it for build/test/install commands, shell pipelines, process management, or dynamic operations that don't map to a tool.
 
-### Web/Network (never bash curl/ping)
-- `web-search` — search the web
-- `web-fetch` — fetch URLs
-- `ping`, `dns`, `dig`, `whois`, `ip`, `port-check`
-- `http-check`, `http-status`, `headers`, `ssl`
+**Never use bash for**: network checks, data transformation, encoding, math, date manipulation, text processing, or file reading — those all have dedicated tools.
 
-### Date/Math (never bash date/bc)
-- `date`, `cron`, `duration`, `countdown`, `clock`, `age`, `timer`, `wait`
-- `math`, `units`, `roman`
-- `coin`, `dice`, `lottery`, `password`
-
-### Encoding/Format (never bash base64/shasum)
-- `base64`, `base58`, `hex`, `hash`, `uuid`
-- `html-entities`, `punycode`, `quoted-printable`, `url`
-- `jwt`, `semver`, `template`
-
-### Rule
-If a plugin tool exists → USE IT. This gives you structured output, cross-platform support, and better error messages. Your bash permissions are intentionally restricted — the tools are your primary interface.
-
-### Parallel exploration
-When exploring a codebase, dispatch explore and explorer sub-agents concurrently:
-- One agent scans `src/` structure
-- Another scans config files
-- A third scans tests
-This dramatically reduces the time needed to understand a codebase.
+See `.spec/TOOL-MANIFEST.md` for the complete bash→tool mapping reference (all 108 tools).
 
 ## Delegation
 - Call `explore`/`explorer` for breadth across multiple modules

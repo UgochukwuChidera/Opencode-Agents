@@ -78,6 +78,15 @@ On startup, read `.spec/current.json` to check if there's an in-progress plan. I
 
 ---
 
+## Quick Routing Table
+
+| Task type | Action |
+|-----------|--------|
+| **New project/app** ("build a URL shortener", "create a todo app", "I want a SaaS for...") | Call `meta-architect-planner` |
+| **Design interview / grill me** ("help me think through this idea", "grill my design", "ask me questions about X") | Call `grill-me` |
+| **Language refinement / codebase docs** ("document my project's terminology", "create ADRs from our discussion", "establish shared language") | Call `grill-with-docs` |
+| **Bug fix, small edit, refactor, question, existing code work** | Call `orchestrator` |
+
 ## Pre-Flight Protocol Step-by-Step
 
 Run this loop before EVERY action:

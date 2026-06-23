@@ -58,9 +58,23 @@ After each stage, append the stage output to `.spec/current.json` decisions arra
 }
 ```
 
+## CONTEXT.md Pre-Check
+
+Before starting Stage 1 (clarification), check if a `CONTEXT.md` file exists at the project root. If it does:
+
+1. Read CONTEXT.md and extract:
+   - **Glossary terms** — use these as pre-populated definitions, skip asking about them in Stage 1
+   - **Active assumptions** — flag these as already-surfaced, focus on gaps
+   - **Recent decisions** — these may overlap with or inform ADRs
+2. Pass extracted terms to Stage 1 as context so it can skip questions about already-defined terms
+3. If CONTEXT.md has a comprehensive glossary, reduce Stage 1 question budget from ≤7 to ≤4 (only ask about true ambiguities)
+
+If no CONTEXT.md exists, proceed normally.
+
 ## todowrite
 
 Before starting, declare todo items using todowrite:
+- `todowrite "CONTEXT.md pre-check (if exists)"`
 - `todowrite "Stage 0: Stack inference"`
 - `todowrite "Stage 1: Clarification questions"`
 - `todowrite "Stage 2: Domain modeling"`
@@ -127,98 +141,32 @@ After Stage 6 returns successfully:
 
 ## Tool Preference Rules
 
-You have access to **108+ plugin tools**. ALWAYS prefer the dedicated tool over a bash equivalent:
+You have access to **108 plugin tools** plus the platform built-ins (`read`, `glob`, `grep`, `task`, `todowrite`).
+ALWAYS prefer these over bash equivalents.
 
-### Never use bash for these — use the dedicated tool instead:
-| Bash command | Use this tool instead |
+### Most common bash→tool mappings
+| Instead of this bash command | Use this tool |
 |---|---|
-| `ping`, `ping6` | `ping` |
-| `dig`, `nslookup`, `host` | `dns` or `dig` |
-| `whois` | `whois` |
-| `curl ifconfig.me` / `ip addr` | `ip` |
-| `nc -zv host port` | `port-check` |
-| `curl -I` / `wget --spider` | `headers` or `http-check` |
-| `openssl s_client` | `ssl` |
-| `traceroute`, `tracert` | `traceroute` |
-| `curl` / `wget` (fetching) | `web-fetch` |
-| `jq`, `python -c json` | `json` |
-| `yq` | `yaml` |
-| `xmlstarlet`, `xmllint` | `xml` |
-| `date`, `date +%s` | `date` |
-| `crontab -l` / format | `cron` |
-| `bc`, `python -c "2+2"` | `math` |
-| `units`, `convert` | `units` |
-| `uuidgen` | `uuid` |
-| `sha256sum`, `md5sum`, `shasum` | `hash` |
-| `openssl rand` / `pwgen` | `password` |
-| `echo "..." \| base64` | `base64` |
-| `fortune`, `shuf -n1` | `shuffle`, `coin`, `dice`, `lottery` |
-| `diff`, `cmp` | `diff` |
-| `patch` | `patch` |
-| `cat` | `read` |
-| `grep`, `rg`, `ack` | `grep` (built-in or plugin) |
-| `head` / `tail` | `head` / `tail` |
-| `wc` | `wc` |
-| `sort` / `uniq` / `shuf` | `sort` / `uniq` / `shuffle` |
-| `sed` | `sed` |
-| `tr`, `tolower`, `toupper` | `tr` or `case-convert` |
-| `cut` | `cut` |
-| `split` | `split` |
-| `paste`, `join` | `paste`, `join` |
-| `uname -a`, `system_profiler` | `system-info` or `platform` |
-| `echo $PATH` | `env` |
-| `python -c "..."` for encoding | `base64`, `base58`, `hex`, `rot13`, `ascii85` |
-| `xxd`, `od` | `hex` or `binary` |
-| `uuidparse` | `uuid-parse` |
-| `npx semver` | `semver` |
-| `python -c url` | `url` |
-| `npm search` | `web-search` |
+| `cat`, `head`, `tail`, `wc` | `read`, `head`, `tail`, `wc` |
+| `grep`, `rg`, `ack` (code search) | `grep` (built-in) |
+| `curl`, `wget` (fetching URLs) | `web-fetch` |
+| `curl -I`, `wget --spider` | `headers`, `http-check` |
 | `ls -la` | `file-list` |
-| `find` | `file-search` |
-| `charcount`, `wordcount` | `text-stats` |
-| `sed 's/foo/bar/g'` (regex) | `regex` or `sed` |
-| `htmlentities` / `html-entities` | `html-entities` |
-| `idn` / `punycode` | `punycode` |
-| `iconv` | `unicode` |
-| `pem` / `cert` parsing | `pem` |
-| `openssl dgst -md4` | `ntlm` |
-| `python -c pickle` | `pickle` |
-| `npm ls` / version | `semver` |
-| `git init` with template | `gitignore` |
-| `columns`, `column -t` | `table` |
-| `ascii bar chart` | `chart` or `progress` |
-| `jsontemplate` / `mustache` | `template` |
-| `realpath` / `readlink -f` | `path-join` or `path-convert` |
-| `dirname` / `basename` | `path-join` |
-| `image magick identify` | `image` or `mime` |
-| `convert rgb to hsl` | `color` |
-| `geolocation` / `distance` | `geo` |
-| `qrencode` | `qr` |
-| `emoji picker` | `emoji` |
-| `wget xkcd.com` | `xkcd` |
-| `python -c "import jwt"` | `jwt` |
-| `license` lookups | `license` |
-| `python -c timedelta` | `duration` or `countdown` or `age` |
+| `find . -name` | `glob` or `file-search` |
+| `date`, `date +%s` | `date` |
 | `sleep` | `wait` |
-| `time` command | `timer` |
-| `TZ=... date` | `clock` |
+| `diff`, `cmp` | `diff` |
+| `jq`, `python -c json` | `json` |
+| `uuidgen` | `uuid` |
+| `sha256sum`, `md5sum`, `base64` | `hash`, `base64` |
+| `dig`, `nslookup`, `whois`, `ping` | `dig`, `whois`, `ping` |
+| `sed`, `tr`, `sort`, `uniq` | `sed`, `tr`, `sort`, `uniq` |
 
-### Rule
+**Key rule**: If a dedicated tool exists → use it. Bash is the **escape hatch** — use it for build/test/install commands, shell pipelines, process management, or dynamic operations that don't map to a tool.
 
-If a plugin tool exists → USE IT. Bash is the **escape hatch** — use it when:
-- No dedicated tool exists for what you need
-- You need shell pipelines, process management, or interactive debugging
-- Running build/test/install commands for the project
-- Running git operations (if you are git-wrangler/commit-crafter)
-- Any dynamic shell operation that does not map to a tool
+**Never use bash for**: network checks, data transformation, encoding, math, date manipulation, text processing, or file reading — those all have dedicated tools.
 
-Do NOT use bash for: network checks, data transformation, encoding, math, date manipulation, or text processing — those all have dedicated tools.
-
-Using dedicated tools means:
-- Cross-platform compatibility (works on Windows/Mac/Linux)
-- Better error messages and structured output
-- No dependency on system utilities being installed
-- Faster execution (no process spawn overhead)
+See `.spec/TOOL-MANIFEST.md` for the complete bash→tool mapping reference (all 108 tools).
 
 ## Web search
 
