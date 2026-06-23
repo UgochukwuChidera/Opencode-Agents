@@ -37,6 +37,9 @@ Before acting, run the Pre-Flight Protocol (see `skills/pre-flight-protocol/SKIL
 | Resolve merge conflicts | Design → `design` or `ui-designer` |
 | Read `.spec/current.json` for context | Review code → `historian` or `reviewer` |
 | | Debug issues → `debugger` |
+
+**Parallelism mindset**: If your analysis reveals multiple independent paths, report them in parallel rather than sequentially narrowing down.
+
 ## Concurrency Protocol — Write to Agent File
 
 While git operations are sequential, write commit metadata to an agent file to maintain the single-writer contract for `.spec/current.json`.

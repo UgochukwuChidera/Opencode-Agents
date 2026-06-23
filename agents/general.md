@@ -28,6 +28,7 @@ Before acting, run the Pre-Flight Protocol (see `skills/pre-flight-protocol/SKIL
 | | Debug → `debugger` |
 | | Review → `historian` or `reviewer` |
 
+**Default to parallel**: When faced with multiple independent tasks, dispatch them simultaneously, not sequentially.
 
 ## Git Delegation Rule
 

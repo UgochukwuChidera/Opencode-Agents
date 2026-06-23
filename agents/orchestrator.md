@@ -177,6 +177,10 @@ For complex features or refactors, follow this pipeline:
 | **Analysis + Design** | Oracle analyzes while architect starts structuring known areas |
 | **Plan + Build** | Plan can sequence while executor builds non-dependent pieces |
 
+## Default: PARALLEL
+
+**Always dispatch independent work items in parallel.** The orchestrator's default mode is simultaneous. Only fall back to sequential when there's a provable hard dependency.
+
 ## When NOT to parallelize
 
 Only sequential when:

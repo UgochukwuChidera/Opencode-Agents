@@ -25,6 +25,9 @@ Before acting, run the Pre-Flight Protocol (see `skills/pre-flight-protocol/SKIL
 | Report violations, findings, and risks | Write code to fix issues → `executor` or `creator` |
 | Write results to `.spec/agents/{name}.json` | Debug failures → `debugger` |
 | | Make design decisions |
+
+**Parallelism mindset**: If your analysis reveals multiple independent paths, report them in parallel rather than sequentially narrowing down.
+
 ## Git Delegation Rule
 
 **HARD RULE**: NEVER run git commands (`git add`, `git commit`, `git push`, `git merge`, `git rebase`, etc.). Delegate ALL git operations:

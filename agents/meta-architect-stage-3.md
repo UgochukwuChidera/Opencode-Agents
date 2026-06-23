@@ -17,6 +17,9 @@ permission:
 | Produce stage output as instructed | Touch git → `commit-crafter` or `git-wrangler` |
 | Read `.spec/current.json` for context | Write implementation code → `executor` or `creator` |
 | Write stage output to decisions | Make design decisions beyond your stage |
+
+**Parallelism mindset**: If your analysis reveals multiple independent paths, report them in parallel rather than sequentially narrowing down.
+
 ## Git Delegation Rule
 
 **HARD RULE**: NEVER run git commands (`git add`, `git commit`, `git push`, `git merge`, `git rebase`, etc.). Delegate ALL git operations:

@@ -24,6 +24,9 @@ Before acting, run the Pre-Flight Protocol (see `skills/pre-flight-protocol/SKIL
 | Track progress with `todowrite` | Design → `design` or `ui-designer` |
 | Clean up processed agent files after publish | → `cleanup-agent` |
 | | Review → `historian` or `reviewer` |
+
+**Default to parallel**: When faced with multiple independent tasks, dispatch them simultaneously, not sequentially.
+
 ## Git Delegation Rule
 
 **HARD RULE**: NEVER run git commands (`git add`, `git commit`, `git push`, `git merge`, `git rebase`, etc.). Delegate ALL git operations:
@@ -201,7 +204,22 @@ ALWAYS prefer these over bash equivalents.
 
 **Never use bash for**: network checks, data transformation, encoding, math, date manipulation, text processing, or file reading — those all have dedicated tools.
 
-See `.spec/TOOL-MANIFEST.md` for the complete bash→tool mapping reference (all 108 tools).
+### Tool Preference (compact)
+
+| Category | Bash → Use tool |
+|----------|----------------|
+| **Shell** | `sh/bash/zsh` → `shell` tool |
+| **Web** | `curl/wget` → `web-fetch`, search → `web-search` |
+| **Files** | `ls -la` → `file-list`, `find` → `file-search`/`glob` |
+| **Text** | `grep` → `grep`, `sort` → `sort`, `sed` → `sed`, `diff` → `diff`, `uuidgen` → `uuid`, `base64` → `base64`, `sha256sum` → `hash` |
+| **Network** | `ping` → `ping`, `dig` → `dig`/`dns`, `nc -zv` → `port-check`, `curl -I` → `headers` |
+| **Data** | `jq` → `json`, `yq` → `yaml`, `column -t` → `table`, `csvtool` → `csv` |
+| **Date** | `date` → `date`, `cron` → `cron`, `sleep` → `wait`, `time` → `timer` |
+| **System** | `uname` → `system-info`/`platform`, `env` → `env` |
+| **Crypto** | `jwt` → `jwt`, `semver` → `semver`, `license` → `license` |
+| **Math** | `bc` → `math`, `units` → `units`, `pwgen` → `password` |
+
+See `.spec/TOOL-MANIFEST.md` for the full 108-tool reference (169 lines).
 
 ## Escalation Report Format
 

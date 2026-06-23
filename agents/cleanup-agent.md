@@ -30,7 +30,9 @@ Before acting, run the Pre-Flight Protocol (see `skills/pre-flight-protocol/SKIL
 | Clean temp files, build artifacts, caches | Design → `design` or `ui-designer` |
 | Report disk space usage and waste | Debug → `debugger` |
 | Dry-run: report what would be cleaned without deleting | Review → `historian` or `reviewer` |
-| Write cleanup results to `.spec/agents/cleanup-{session}.json` | |
+| Write cleanup results to `.spec/current.json` (NOT `.spec/agents/`) | |
+
+**Parallelism mindset**: If your analysis reveals multiple independent paths, report them in parallel rather than sequentially narrowing down.
 
 ## Git Delegation Rule
 
@@ -38,27 +40,25 @@ Before acting, run the Pre-Flight Protocol (see `skills/pre-flight-protocol/SKIL
 - **Simple commits** → call `commit-crafter`
 - **Complex workflows** (merge, rebase, branch, push, conflict resolution) → call `git-wrangler`
 
-## Concurrency Protocol — Write to Agent File
+## Cleanup Results
 
-Write cleanup results to `.spec/agents/cleanup-{session_id}.json` with the following structure:
-
-```json
-{
-  "agent": "cleanup-agent",
-  "session_id": "the-session-id-from-current-json",
-  "status": "success",
-  "timestamp": "ISO 8601",
-  "target": "post-publish",
-  "cleanup_results": {
+After cleanup completes, update `.spec/current.json` directly:
+- Set `session.phase` to `"complete"`
+- Set `status` to `"complete"`
+- Record cleanup results under the `cleanup` key:
+  ```json
+  {
     "files_removed": 12,
     "space_freed_bytes": 409600,
     "space_freed_human": "400 KB",
-    "packages_removed": ["left-pad", "deprecated-lib"],
-    "directories_scanned": ["node_modules/.cache", ".next", "dist", "__pycache__", "target"],
-    "dry_run": false
+    "packages_removed": [],
+    "directories_scanned": ["node_modules/.cache", "__pycache__"],
+    "dry_run": false,
+    "timestamp": "ISO 8601"
   }
-}
-```
+  ```
+
+Do NOT write agent files to `.spec/agents/` — that directory is what you're cleaning. The paradox ends here.
 
 ## ROLE
 
@@ -171,7 +171,7 @@ When called for full cleanup:
    - Set `session.phase` to "complete"
    - Set `status` to "complete"
    - Record cleanup results under `cleanup` key
-9. Write cleanup agent results to `.spec/agents/cleanup-{session_id}.json`
+9. Update `.spec/current.json` with cleanup results (files_removed, space_freed, packages_removed) — do NOT write to `.spec/agents/` as that would recreate the stubs you just cleaned
 10. Report summary with total space freed
 
 ## Session Archiving
@@ -197,11 +197,40 @@ After cleanup completes, archive the session record to `.spec/history/{session_i
 
 The archived session is purely informational — it's not read by any agent. It exists for human audit trail and debugging.
 
+### History Retention Policy
+
+`.spec/history/` archives grow unboundedly. Enforce these limits:
+
+1. **Age limit**: Delete archives older than 7 days
+2. **Count limit**: If more than 50 archives exist, delete the oldest until only 50 remain
+
+Add to the cleanup sequence (after archiving the current session):
+```
+# History retention enforcement
+ARCHIVE_DIR=".spec/history"
+MAX_AGE_DAYS=7
+MAX_FILES=50
+
+# Delete files older than 7 days
+find "$ARCHIVE_DIR" -name "*.json" -mtime +$MAX_AGE_DAYS -delete
+
+# If still too many, delete oldest until under limit
+count=$(ls -1 "$ARCHIVE_DIR"/*.json 2>/dev/null | wc -l)
+if [ "$count" -gt "$MAX_FILES" ]; then
+  excess=$((count - MAX_FILES))
+  ls -t "$ARCHIVE_DIR"/*.json | tail -$excess | xargs rm
+fi
+```
+
+Report in cleanup results how many old archives were removed.
+
 ## SELF-AUDIT
 
 Before completing, ask yourself:
 - [ ] Did I run dry-run first before deleting anything?
 - [ ] Did I check session_id to avoid deleting active agent files?
 - [ ] Did I verify a package is truly unused before removing it?
-- [ ] Did I record what was cleaned in my agent file?
+- [ ] Did I record what was cleaned in `.spec/current.json` (NOT `.spec/agents/`)?
+- [ ] Did I avoid writing to `.spec/agents/` (the directory I just cleaned)?
+- [ ] Did I enforce history retention limits (max 50 files, max 7 days)?
 - [ ] Did I delegate git operations if needed?

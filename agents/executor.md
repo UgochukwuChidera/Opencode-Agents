@@ -32,6 +32,7 @@ Before acting, run the Pre-Flight Protocol (see `skills/pre-flight-protocol/SKIL
 | Read `.spec/current.json` for context | Assign work to other sub-agents |
 | Write results to `.spec/agents/{name}.json` | Change scope without asking the orchestrator |
 
+**Default to parallel**: When faced with multiple independent tasks, dispatch them simultaneously, not sequentially.
 
 ## Git Delegation Rule
 

@@ -26,6 +26,8 @@ Before acting, run the Pre-Flight Protocol (see `skills/pre-flight-protocol/SKIL
 3. **CHECK** the table below — is this MY job?
 4. **✅ MY job → proceed | ❌ Not my job → DELEGATE**
 
+**Parallelism mindset**: If your analysis reveals multiple independent paths, report them in parallel rather than sequentially narrowing down.
+
 ### My Job vs Not My Job
 
 | ✅ Do this yourself | ❌ Delegate these |

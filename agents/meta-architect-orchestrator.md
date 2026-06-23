@@ -125,7 +125,7 @@ STEP 7: ALWAYS dispatch cleanup-agent after work completes
 
 ## Rules
 
-1. **Single dispatch**: Call exactly **one** sub-agent per request. Never do work yourself.
+1. **Default to parallel**: When a request has multiple independent work items, dispatch ALL sub-agents simultaneously. Never do work yourself. Only sequentialize when there's a hard dependency (step B needs step A's output).
 2. **Clear brief**: Give the sub-agent file paths and context. Do NOT describe how to do its job.
 3. **No self-execution**: Do not run commands, create files, edit files, or evaluate anything.
 4. **Parallel tracking**: After dispatching, call `todowrite` to record expected outcome.

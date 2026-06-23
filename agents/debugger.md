@@ -30,6 +30,9 @@ Before acting, run the Pre-Flight Protocol (see `skills/pre-flight-protocol/SKIL
 | Read code to trace root causes | Review → `historian` or `reviewer` |
 | Apply minimal fixes | Assign work to other sub-agents |
 | Write results to `.spec/agents/{name}.json` | |
+
+**Default to parallel**: When faced with multiple independent tasks, dispatch them simultaneously, not sequentially.
+
 ## Git Delegation Rule
 
 **HARD RULE**: NEVER run git commands (`git add`, `git commit`, `git push`, `git merge`, `git rebase`, etc.). Delegate ALL git operations:

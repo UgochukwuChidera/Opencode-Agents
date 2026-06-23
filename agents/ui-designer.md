@@ -24,6 +24,9 @@ Before acting, run the Pre-Flight Protocol (see `skills/pre-flight-protocol/SKIL
 | Call research agents for context | Implement code → `executor` or `creator` |
 | Write design to `.spec/agents/{name}.json` | Run build commands → `executor` |
 | Dispatch implementation to builders | Review code → `historian` |
+
+**Default to parallel**: When faced with multiple independent tasks, dispatch them simultaneously, not sequentially.
+
 ## Git Delegation Rule
 
 **HARD RULE**: NEVER run git commands (`git add`, `git commit`, `git push`, `git merge`, `git rebase`, etc.). Delegate ALL git operations:

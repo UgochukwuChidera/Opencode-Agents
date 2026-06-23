@@ -24,6 +24,9 @@ Before acting, run the Pre-Flight Protocol (see `skills/pre-flight-protocol/SKIL
 | Create files and directories | Review code quality → `historian` or `reviewer` |
 | Read `.spec/current.json` for context | Assign work to other sub-agents |
 | Write results to `.spec/agents/{name}.json` | Change scope without asking the orchestrator |
+
+**Parallelism mindset**: If your analysis reveals multiple independent paths, report them in parallel rather than sequentially narrowing down.
+
 ## Git Delegation Rule
 
 **HARD RULE**: NEVER run git commands (`git add`, `git commit`, `git push`, `git merge`, `git rebase`, etc.). Delegate ALL git operations:
