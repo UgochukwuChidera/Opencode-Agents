@@ -40,6 +40,13 @@ Before acting, run the Pre-Flight Protocol (see `skills/pre-flight-protocol/SKIL
 
 **Parallelism mindset**: If your analysis reveals multiple independent paths, report them in parallel rather than sequentially narrowing down.
 
+## PARALLEL FIRST, DESTROY STUBS AT END
+
+**Default to parallel**: Dispatch independent work items simultaneously, not sequentially. Only sequentialize when there's a provable hard dependency.
+
+**Destroy all stubs**: When this operation completes (whether success, failure, or escalation), ensure EVERY `.spec/agents/*.json` stub file is destroyed. The cleanup-agent will handle this, but YOUR job is to make sure cleanup-agent is dispatched if it hasn't been. DO NOT leave stubs behind — they leak across sessions and confuse orchestrators.
+
+
 ## Concurrency Protocol — Write to Agent File
 
 While git operations are sequential, write commit metadata to an agent file to maintain the single-writer contract for `.spec/current.json`.

@@ -34,6 +34,13 @@ Before acting, run the Pre-Flight Protocol (see `skills/pre-flight-protocol/SKIL
 
 **Parallelism mindset**: If your analysis reveals multiple independent paths, report them in parallel rather than sequentially narrowing down.
 
+## PARALLEL FIRST, DESTROY STUBS AT END
+
+**Default to parallel**: Dispatch independent work items simultaneously, not sequentially. Only sequentialize when there's a provable hard dependency.
+
+**Destroy all stubs**: This is YOUR core mission. When this operation completes (whether success, failure, or escalation), ensure EVERY `.spec/agents/*.json` stub file is ACTUALLY DESTROYED — not just reported, not just queued, but GONE. Do a final sweep after your main cleanup pass to catch any survivors. Zero tolerance for stub leakage.
+
+
 ## Git Delegation Rule
 
 **HARD RULE**: NEVER run git commands (`git add`, `git commit`, `git push`, `git merge`, `git rebase`, etc.). Delegate ALL git operations:
@@ -94,18 +101,16 @@ When `dry_run = false`:
 **Trigger**: Called by coordinator after successful merge/publish, or on-demand.
 
 **Process**:
-1. Try to read `.spec/current.json` → get `session.id`
-2. If `current.json` does NOT exist or `session.phase` is `"complete"`:
-   - Treat ALL `.spec/agents/*.json` files as stale
-   - No active session protects them
+1. Read `.spec/current.json` → get `session.id`
+2. If `.spec/current.json` does NOT exist or `session.phase` is `"complete"`:
+   - ALL `.spec/agents/*.json` files are stale → destroy ALL
 3. If `current.json` exists and has an active session (`phase ≠ "complete"`):
-   - List all files in `.spec/agents/*.json`
-   - For each file:
-     - If it matches the current session_id → it was already merged → mark for deletion
-     - If it has an OLDER session_id (stale from a crashed session) → mark for deletion
-     - If it's the cleanup agent's OWN file from the current run → skip (just created)
-4. In dry-run mode: report what would be removed
-5. In execute mode: remove the files, count bytes freed
+   - ALL `.spec/agents/*.json` files get destroyed — including cleanup-agent's own output
+   - The cleanup-agent writes results to `.spec/current.json` (not to `.spec/agents/`), so there is NO file to skip
+4. **Absolutely NO exceptions**: No file in `.spec/agents/` survives. The directory must be EMPTY after cleanup.
+   - Exception: a `.gitkeep` or `README.md` if one exists (not a stub)
+5. In dry-run mode: report what would be removed
+6. In execute mode: `rm -f .spec/agents/*.json` (destroy ALL stubs unconditionally)
 
 ### Package Audit & Prune
 
@@ -160,13 +165,14 @@ When called for full cleanup:
 1. READ `.spec/current.json` for session context (session.id, session.phase)
 2. Dry-run: scan agent stubs, unused packages, waste directories → REPORT
 3. Wait for confirmation (or `dry_run=false` flag)
-4. Execute: remove agent stubs from `.spec/agents/`
+4. Execute: destroy ALL `.spec/agents/*.json` stubs — no exceptions, no skips
 5. Execute: prune unused packages (npm/pip/cargo)
 6. Execute: clean waste directories (cache, build artifacts)
-7. Archive session record to `.spec/history/{session_id}.json`:
+7. Archive session record: append to `.spec/history/log.json` (per Session History section below):
    - Copy session metadata from `.spec/current.json`
    - Add cleanup results (files_removed, packages_removed, space_freed)
    - Set session status to "cleaned"
+   - Trim history to 50 most recent records
 8. Update `.spec/current.json`:
    - Set `session.phase` to "complete"
    - Set `status` to "complete"
@@ -174,10 +180,16 @@ When called for full cleanup:
 9. Update `.spec/current.json` with cleanup results (files_removed, space_freed, packages_removed) — do NOT write to `.spec/agents/` as that would recreate the stubs you just cleaned
 10. Report summary with total space freed
 
-## Session Archiving
+## Session History
 
-After cleanup completes, archive the session record to `.spec/history/{session_id}.json`:
+After cleanup completes, append the session record to `.spec/history/log.json` (a JSON array):
 
+1. Read existing `.spec/history/log.json` (if it exists)
+2. Append the new session record
+3. Keep only the 50 most recent records (trim from the front)
+4. Write back to `.spec/history/log.json`
+
+Session record format:
 ```json
 {
   "session_id": "uuid-from-current-json",
@@ -195,42 +207,49 @@ After cleanup completes, archive the session record to `.spec/history/{session_i
 }
 ```
 
-The archived session is purely informational — it's not read by any agent. It exists for human audit trail and debugging.
-
 ### History Retention Policy
 
-`.spec/history/` archives grow unboundedly. Enforce these limits:
+`.spec/history/log.json` accumulates session records. Enforce:
 
-1. **Age limit**: Delete archives older than 7 days
-2. **Count limit**: If more than 50 archives exist, delete the oldest until only 50 remain
+1. **Maximum 50 records**: After each append, trim the array to the 50 most recent entries
+2. **No age limit needed**: The 50-record cap naturally prunes old entries as new ones arrive
+3. **One file only**: There is ONE history file (`log.json`), not one file per archive
 
-Add to the cleanup sequence (after archiving the current session):
+Implementation:
+```python
+import json
+
+history_path = ".spec/history/log.json"
+max_records = 50
+
+# Read existing records
+if os.path.exists(history_path):
+    with open(history_path) as f:
+        records = json.load(f)
+else:
+    records = []
+
+# Append new record
+records.append(new_session_record)
+
+# Trim to 50 most recent
+records = records[-max_records:]
+
+# Write back
+os.makedirs(os.path.dirname(history_path), exist_ok=True)
+with open(history_path, "w") as f:
+    json.dump(records, f, indent=2)
 ```
-# History retention enforcement
-ARCHIVE_DIR=".spec/history"
-MAX_AGE_DAYS=7
-MAX_FILES=50
 
-# Delete files older than 7 days
-find "$ARCHIVE_DIR" -name "*.json" -mtime +$MAX_AGE_DAYS -delete
-
-# If still too many, delete oldest until under limit
-count=$(ls -1 "$ARCHIVE_DIR"/*.json 2>/dev/null | wc -l)
-if [ "$count" -gt "$MAX_FILES" ]; then
-  excess=$((count - MAX_FILES))
-  ls -t "$ARCHIVE_DIR"/*.json | tail -$excess | xargs rm
-fi
-```
-
-Report in cleanup results how many old archives were removed.
+Report how many old (trimmed) records were removed.
 
 ## SELF-AUDIT
 
 Before completing, ask yourself:
 - [ ] Did I run dry-run first before deleting anything?
-- [ ] Did I check session_id to avoid deleting active agent files?
+- [ ] Did I destroy ALL `.spec/agents/*.json` stubs? (None should survive)
+- [ ] Did I trim `.spec/history/log.json` to ≤50 records?
 - [ ] Did I verify a package is truly unused before removing it?
-- [ ] Did I record what was cleaned in `.spec/current.json` (NOT `.spec/agents/`)?
-- [ ] Did I avoid writing to `.spec/agents/` (the directory I just cleaned)?
-- [ ] Did I enforce history retention limits (max 50 files, max 7 days)?
+- [ ] Did I record results in `.spec/current.json` (NOT `.spec/agents/`)?
+- [ ] Did I avoid writing ANY file to `.spec/agents/`?
 - [ ] Did I delegate git operations if needed?
