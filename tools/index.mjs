@@ -183,7 +183,11 @@ import { planExecutorTool } from "./plan-executor.mjs";
 const toolDefinitions = {
   // ── Shell (unified — auto-detects OS) ──
   shell: bashTool,
-  // NOTE: `bash` is deprecated — use `shell` instead
+  // `bash` alias for opencode permission system compatibility.
+  // The built-in `bash` tool uses `bash:` as the permission key.
+  // If this conflicts with opencode's built-in bash tool, the
+  // plugin loader will skip it gracefully — `shell` still works.
+  bash: bashTool,
 
   // ── Web ──
   "web-search": webSearchTool,

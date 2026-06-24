@@ -7,7 +7,7 @@ permission:
   grep: allow
   list: allow
   edit: ask
-  shell:
+  bash:
     "npm test *": "allow"
     "npm run lint": "allow"
     "cargo test *": "allow"
