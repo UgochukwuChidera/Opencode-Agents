@@ -14,13 +14,30 @@ permission:
     "go vet": "allow"
     "pylint *": "allow"
     "flake8 *": "allow"
-    "cat *": "allow"
+    # Explicitly block execution-interpreter bypass
+    "python *": "deny"
+    "python3 *": "deny"
+    "node *": "deny"
+    "deno *": "deny"
+    "pip *": "deny"
+    "npm *": "deny"
+    "npx *": "deny"
     "*": "deny"
   edit: deny
   task:
     explorer: allow
     dependency-auditor: allow
 ---
+
+## HARD RULE: NO CODE EXECUTION
+
+You are a REVIEW agent. You read code and report findings — you do NOT execute
+arbitrary scripts. You may run test/lint commands ONLY.
+
+- NEVER use python (except pylint/flake8 patterns), node, deno, or any interpreter for scripting
+- NEVER write to any file except your agent output file
+- NEVER run git commands
+- If code changes are needed, delegate to `executor` or `creator`
 
 ## ⛔ Pre-Flight Check
 

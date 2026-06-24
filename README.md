@@ -63,8 +63,8 @@ Every agent follows the **Spec-First** pattern: READ `.spec/current.json` before
 | **meta-architect-planner** | `subagent` | Runs the 6-stage Meta-Architect planning pipeline — accumulates compact decision records in-memory, dispatches stage agents, writes plan.json |
 | **meta-architect-executor** | `subagent` | Executes a Meta-Architect build plan — extracts prompt queue, dispatches prompt-executor for each, runs evaluators, merges agent files, calls debugger on failure |
 | **design** | `all` | Dynamic orchestrator — ascertains details, synthesizes context via soul/oracle, produces design spec, dispatches to creator/executor, reviews via historian. Pre-flight + git delegation baked in. |
-| **oracle** | `all` | Deep codebase understanding for large-scale architectural analysis — dispatches parallel explore sub-agents. Writes analysis to agent file. |
-| **architect** | `subagent` | Turns analysis into actionable architecture plans — bridges oracle → structured plan → execution |
+| **oracle** | `all` | Deep codebase understanding for large-scale architectural analysis — dispatches parallel explore sub-agents. PURE RESEARCH — never edits code or executes scripts. Writes analysis to agent file. |
+| **architect** | `all` | Turns analysis into actionable architecture plans — bridges oracle → structured plan → execution |
 | **soul** | `subagent` | Synthesizes project essence — architecture, conventions, domain model. Fast, focused synthesis. |
 | **creator** | `subagent` | Creative implementor — fuses ideas into elegant code. Writes agent file, delegates git to commit-crafter. Pre-flight + git delegation baked in. |
 | **executor** | `subagent` | Implements code changes from specs — fast, clean, pattern-aware. Writes agent file, delegates git to commit-crafter. Pre-flight + git delegation baked in. |
@@ -91,6 +91,19 @@ Every agent follows the **Spec-First** pattern: READ `.spec/current.json` before
 | **meta-architect-stage-4** | `subagent` | UI/UX designer — produces design token summary, component specs, animation behaviors |
 | **meta-architect-stage-5** | `subagent` | Build-prompt engineer — generates full implementation prompts with actual code and commands |
 | **meta-architect-stage-6** | `subagent` | Build plan writer — compiles all stage outputs into the final plan.json file on disk |
+
+### Security & Permission Hardening
+
+All agents have explicit **interpreter execution blocking** — `python`, `python3`, `node`, `deno`, `pip`, `npm`, `npx` are explicitly denied in shell permissions for research/review agents. Code-writing agents (executor, creator, debugger, test-writer, general) retain full shell access as needed for their role.
+
+| Agent Type | Edit | Shell | Interpreters Blocked |
+|---|---|---|---|
+| **Research** (oracle, explore, explorer, soul, architect) | `deny` | Read-only (rg, find, wc, ls) | python, python3, node, deno, pip, npm, npx |
+| **Review** (historian, reviewer) | `ask`/`deny` | Test/lint commands only | python, node, deno, pip, npm, npx |
+| **Design/Coordinate** (design, orchestrator, meta-architect-orchestrator) | `deny` | `deny` | N/A (shell is denied entirely) |
+| **Build** (executor, creator, debugger, test-writer, general, cleanup-agent) | `allow` | `allow` | None — full shell required for role |
+
+Every research agent also has a `## HARD RULE: NO CODE EXECUTION` section in its prompt body reinforcing that it must never run interpreters, edit files (beyond its agent output), or execute arbitrary scripts.
 
 ## Skills
 
@@ -185,6 +198,8 @@ Simple commits → `commit-crafter`
 Complex workflows (merge, rebase, push, conflict resolution) → `git-wrangler`
 
 Every non-git agent has this rule prominently stated in its definition. The entry-point orchestrator (`meta-architect-orchestrator`) has `edit: deny` and `bash: deny` — it physically cannot write files or run commands.
+
+> **Note**: Agent permissions use the `shell:` key in frontmatter matching the `shell` plugin tool. If you experience permission bypasses (agents running python/node despite restrictions), ensure your opencode version recognizes `shell:` as a permission key, or alias it as `bash:` in your agent frontmatter.
 
 ## Cross-Platform OS Adaptation
 

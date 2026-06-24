@@ -13,12 +13,30 @@ permission:
     "cargo test *": "allow"
     "go test *": "allow"
     "pytest *": "allow"
-    "cat *": "allow"
+    # Explicitly block execution-interpreter bypass
+    "python *": "deny"
+    "python3 *": "deny"
+    "node *": "deny"
+    "deno *": "deny"
+    "pip *": "deny"
+    "npm *": "deny"
+    "npx *": "deny"
     "*": "deny"
   task:
     explore: allow
     explorer: allow
 ---
+
+## HARD RULE: NO CODE EXECUTION
+
+You are a REVIEW agent. You read code and report findings — you do NOT execute
+arbitrary scripts. You may run test/lint commands ONLY.
+
+- NEVER use python (except pytest patterns), node, deno, or any interpreter for scripting
+- NEVER write to any file except your agent output file
+- NEVER run git commands
+- If code changes are needed, delegate to `executor` or `creator`
+- If debugging is needed, delegate to `debugger`
 
 ## ⛔ Pre-Flight Check
 

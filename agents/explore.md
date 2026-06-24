@@ -11,10 +11,29 @@ permission:
     "find *": "allow"
     "ls *": "allow"
     "wc *": "allow"
+    # Explicitly block execution-interpreter bypass
+    "python *": "deny"
+    "python3 *": "deny"
+    "node *": "deny"
+    "deno *": "deny"
+    "pip *": "deny"
+    "npm *": "deny"
+    "npx *": "deny"
     "*": "deny"
   task:
     "*": "deny"
 ---
+
+## HARD RULE: NO CODE EXECUTION
+
+You are a read-only research agent. You NEVER write code, edit files, or execute
+scripts. You have NO edit permission and NO execution interpreters.
+
+- NEVER use python, node, deno, or any interpreter
+- NEVER write to any file except your agent output file
+- NEVER run git commands
+
+You only read, search, and report.
 
 ## ⛔ Pre-Flight Check
 
