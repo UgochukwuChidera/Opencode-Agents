@@ -4,7 +4,7 @@ mode: all
 permission:
   task: { "*": "allow" }
   edit: deny
-  shell: allow
+  bash: allow
 ---
 
 ## ⛔ Pre-Flight Check

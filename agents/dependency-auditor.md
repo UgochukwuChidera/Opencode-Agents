@@ -7,7 +7,7 @@ permission:
   grep: allow
   list: allow
   edit: deny
-  shell:
+  bash:
     "npm outdated": "allow"
     "pip list --outdated": "allow"
     "npm audit": "allow"

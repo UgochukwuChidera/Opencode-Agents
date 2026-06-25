@@ -7,7 +7,7 @@ permission:
   grep: allow
   list: allow
   edit: allow
-  shell: allow
+  bash: allow
   task: { "*": "allow" }
 ---
 ## ⛔ Pre-Flight Check

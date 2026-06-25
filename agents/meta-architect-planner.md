@@ -4,7 +4,7 @@ mode: all
 permission:
   task: { "*": "allow" }
   edit: allow
-  shell: allow
+  bash: allow
   webfetch: allow
   websearch: allow
 ---

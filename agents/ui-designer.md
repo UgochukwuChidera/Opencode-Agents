@@ -5,7 +5,7 @@ permission:
   read: allow
   task: { "explore": "allow", "web-search": "allow" }
   edit: deny
-  shell: deny
+  bash: deny
 ---
 
 ## ⛔ Pre-Flight Check

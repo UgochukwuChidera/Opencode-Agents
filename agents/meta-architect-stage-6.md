@@ -3,7 +3,7 @@ description: Build plan writer — compiles all stage outputs into the final pla
 mode: subagent
 permission:
   read: allow
-  shell: allow
+  bash: allow
   edit: allow
   task: { "explore": "allow" }
 ---

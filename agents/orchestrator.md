@@ -8,7 +8,7 @@ permission:
   list: allow
   task: { "*": "allow" }
   edit: deny
-  shell: deny
+  bash: deny
 ---
 
 ## ⛔ Pre-Flight Check

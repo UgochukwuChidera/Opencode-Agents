@@ -7,7 +7,7 @@ permission:
   grep: allow
   list: allow
   edit: deny
-  shell: deny
+  bash: deny
   task:
     soul: allow
     oracle: allow

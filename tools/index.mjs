@@ -21,9 +21,6 @@
  */
 import { tool } from "@opencode-ai/plugin";
 
-// ─── Shell execution ───────────────────────────────────────────────
-import { bashTool } from "./bash-tool.mjs";
-
 // ─── Web tools ─────────────────────────────────────────────────────
 import { webSearchTool } from "./web-search.mjs";
 import { webFetchTool } from "./web-fetch.mjs";
@@ -181,14 +178,6 @@ import { planExecutorTool } from "./plan-executor.mjs";
  * Each key becomes the tool name visible to agents.
  */
 const toolDefinitions = {
-  // ── Shell (unified — auto-detects OS) ──
-  shell: bashTool,
-  // `bash` alias for opencode permission system compatibility.
-  // The built-in `bash` tool uses `bash:` as the permission key.
-  // If this conflicts with opencode's built-in bash tool, the
-  // plugin loader will skip it gracefully — `shell` still works.
-  bash: bashTool,
-
   // ── Web ──
   "web-search": webSearchTool,
   "web-fetch": webFetchTool,
