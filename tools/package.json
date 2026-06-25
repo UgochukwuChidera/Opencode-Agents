@@ -1,0 +1,8 @@
+{
+  "name": "opencode-tools",
+  "version": "1.0.0",
+  "description": "Custom tools for Opencode agents",
+  "main": "index.mjs",
+  "type": "module",
+  "license": "MIT"
+}

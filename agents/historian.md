@@ -7,6 +7,7 @@ permission:
   grep: allow
   list: allow
   edit: ask
+  todowrite: allow
   shell:
     "npm test *": "allow"
     "npm run lint": "allow"
