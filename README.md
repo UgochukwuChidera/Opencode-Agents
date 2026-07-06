@@ -75,7 +75,6 @@ Every agent follows the **Spec-First** pattern: READ `.spec/current.json` before
 | **reviewer** | `subagent` | Reviews code for bugs, security, and best practices — thorough but not blocking. Writes findings to agent file. |
 | **debugger** | `subagent` | Investigates runtime errors and test failures by systematic root cause analysis — reads code, traces backward, applies minimal fixes. Writes to agent file, delegates git. |
 | **test-writer** | `subagent` | Writes thorough tests covering happy path, edge cases, error states, and regressions. Writes to agent file, delegates git. |
-| **commit-crafter** | `subagent` | (DEPRECATED — fused into git-wrangler) |
 | **git-wrangler** | `subagent` | ONLY agent allowed to handle complex git workflows — stash, pull, branch, merge, rebase, resolve conflicts, push. Writes action log to agent file. |
 | **dependency-auditor** | `subagent` | Audits dependencies for updates and vulnerabilities. Writes to agent file. |
 | **spec-verifier** | `subagent` | Verifies implemented components match Meta-Architect component specs — checks all 4 states, Tailwind classes, accessibility. Writes verdict to agent file. |

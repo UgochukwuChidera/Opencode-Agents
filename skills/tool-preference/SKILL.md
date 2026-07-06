@@ -5,7 +5,7 @@ description: Use when deciding whether to use a plugin tool or bash. Covers the 
 
 ## Git Delegation Rule
 
-**HARD RULE**: NEVER run git commands. Delegate ALL git operations to `commit-crafter` or `git-wrangler`.
+**HARD RULE**: NEVER run git commands. Delegate ALL git operations to `git-wrangler`.
 
 # Tool Preference Guide
 

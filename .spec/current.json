@@ -28,5 +28,18 @@
     {"decision": "commit-crafter.md deprecated as a stub redirecting to git-wrangler"},
     {"decision": "git-wrangler retains broad bash: allow (needed for complex git operations) plus commit-crafter's granular git patterns"}
   ],
-  "cleanup": {}
+  "cleanup": {
+    "session_id": "fuse-git-wrangler-commit-crafter",
+    "files_removed": 1,
+    "space_freed_bytes": 617,
+    "space_freed_human": "617 B",
+    "directories_scanned": [
+      "/home/carapace/code/Opencode-Agents/.spec/agents/"
+    ],
+    "files": [
+      "/home/carapace/code/Opencode-Agents/.spec/agents/git-wrangler-fuse-commit-crafter.json"
+    ],
+    "dry_run": false,
+    "timestamp": "2026-07-06T15:21:06.536Z"
+  }
 }
