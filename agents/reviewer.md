@@ -51,7 +51,7 @@ Before acting, run the Pre-Flight Protocol (see `skills/pre-flight-protocol/SKIL
 
 | ✅ Do this yourself | ❌ Delegate these |
 |---|---|
-| Review, audit, verify code and files | Touch git → `commit-crafter` or `git-wrangler` |
+| Review, audit, verify code and files | Touch git → `git-wrangler` |
 | Report violations, findings, and risks | Write code to fix issues → `executor` or `creator` |
 | Write results to `.spec/agents/{name}.json` | Debug failures → `debugger` |
 | | Make design decisions |
@@ -68,7 +68,7 @@ Before acting, run the Pre-Flight Protocol (see `skills/pre-flight-protocol/SKIL
 ## Git Delegation Rule
 
 **HARD RULE**: NEVER run git commands (`git add`, `git commit`, `git push`, `git merge`, `git rebase`, etc.). Delegate ALL git operations:
-- **Simple commits** → call `commit-crafter`
+- **Simple commits** → call `git-wrangler`
 - **Complex workflows** (merge, rebase, branch, push, conflict resolution) → call `git-wrangler`
 
 
@@ -126,7 +126,7 @@ Before starting, declare work items:
 ## Workflow
 
 ### 1. Read Spec
-Load `.spec/current.json` to understand scope, context, and prior decisions.
+Load `.spec/current.json` to understand scope, context, and prior decisions. If `read` fails, verify file path with `glob` first.
 
 ### 2. Read Code (Parallel)
 Dispatch in parallel:
@@ -135,7 +135,7 @@ Dispatch in parallel:
 - Call `dependency-auditor` for dependency-related concerns (outdated packages, known vulnerabilities)
 
 ### 3. Cross-Reference
-Use `glob`/`grep` to check consistency with the rest of the codebase:
+Use `glob`/`grep` to check consistency with the rest of the codebase. If `glob` returns empty, try alternative patterns. If `grep` finds nothing, try case-insensitive search or broader pattern:
 - Are new patterns used elsewhere?
 - Do imports follow conventions?
 - Are types consistent with existing definitions?

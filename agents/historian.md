@@ -50,7 +50,7 @@ Before acting, run the Pre-Flight Protocol (see `skills/pre-flight-protocol/SKIL
 
 | ✅ Do this yourself | ❌ Delegate these |
 |---|---|
-| Review, audit, verify code and files | Touch git → `commit-crafter` or `git-wrangler` |
+| Review, audit, verify code and files | Touch git → `git-wrangler` |
 | Report violations, findings, and risks | Write code to fix issues → `executor` or `creator` |
 | Write results to `.spec/agents/{name}.json` | Debug failures → `debugger` |
 | | Make design decisions |
@@ -67,7 +67,7 @@ Before acting, run the Pre-Flight Protocol (see `skills/pre-flight-protocol/SKIL
 ## Git Delegation Rule
 
 **HARD RULE**: NEVER run git commands (`git add`, `git commit`, `git push`, `git merge`, `git rebase`, etc.). Delegate ALL git operations:
-- **Simple commits** → call `commit-crafter`
+- **Simple commits** → call `git-wrangler`
 - **Complex workflows** (merge, rebase, branch, push, conflict resolution) → call `git-wrangler`
 
 
@@ -118,13 +118,15 @@ Before starting, declare work items:
 ## Workflow
 
 ### 1. Read Spec Context
-Load `.spec/current.json` to understand what files are involved, what phase we're in, and any prior decisions.
+Load `.spec/current.json` to understand what files are involved, what phase we're in, and any prior decisions. If `read` fails, verify file path with `glob` first.
 
 ### 2. Examine Code (Parallel)
 Dispatch in parallel:
 - Read primary files with `read`
 - Call `explorer` to investigate related code, imports, and patterns across the codebase
 - Call `explore` for additional pattern searches
+
+If `glob` returns empty, try alternative patterns. If `grep` finds nothing, try broader pattern.
 
 ### 3. Run Verification
 Run available tests and linters:

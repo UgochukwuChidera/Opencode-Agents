@@ -66,8 +66,8 @@ Every agent follows the **Spec-First** pattern: READ `.spec/current.json` before
 | **oracle** | `all` | Deep codebase understanding for large-scale architectural analysis — dispatches parallel explore sub-agents. PURE RESEARCH — never edits code or executes scripts. Writes analysis to agent file. |
 | **architect** | `all` | Turns analysis into actionable architecture plans — bridges oracle → structured plan → execution |
 | **soul** | `subagent` | Synthesizes project essence — architecture, conventions, domain model. Fast, focused synthesis. |
-| **creator** | `subagent` | Creative implementor — fuses ideas into elegant code. Writes agent file, delegates git to commit-crafter. Pre-flight + git delegation baked in. |
-| **executor** | `subagent` | Implements code changes from specs — fast, clean, pattern-aware. Writes agent file, delegates git to commit-crafter. Pre-flight + git delegation baked in. |
+| **creator** | `subagent` | Creative implementor — fuses ideas into elegant code. Writes agent file, delegates git to git-wrangler. Pre-flight + git delegation baked in. |
+| **executor** | `subagent` | Implements code changes from specs — fast, clean, pattern-aware. Writes agent file, delegates git to git-wrangler. Pre-flight + git delegation baked in. |
 | **prompt-executor** | `subagent` | Executes a single prompt from a Meta-Architect build plan — runs commands, creates files, retries up to 5 times. Writes per-prompt agent file. |
 | **explorer** | `subagent` | Read-only codebase research — searches code, finds patterns, maps structure. Fast, parallel dispatch. |
 | **explore** | `subagent` | Fast agent specialized for exploring codebases — quickly finds files by patterns, searches code for keywords |
@@ -75,7 +75,7 @@ Every agent follows the **Spec-First** pattern: READ `.spec/current.json` before
 | **reviewer** | `subagent` | Reviews code for bugs, security, and best practices — thorough but not blocking. Writes findings to agent file. |
 | **debugger** | `subagent` | Investigates runtime errors and test failures by systematic root cause analysis — reads code, traces backward, applies minimal fixes. Writes to agent file, delegates git. |
 | **test-writer** | `subagent` | Writes thorough tests covering happy path, edge cases, error states, and regressions. Writes to agent file, delegates git. |
-| **commit-crafter** | `subagent` | ONLY agent allowed to stage+commit. Stages files, writes conventional commits, writes commit metadata to agent file. Pre-flight baked in. |
+| **commit-crafter** | `subagent` | (DEPRECATED — fused into git-wrangler) |
 | **git-wrangler** | `subagent` | ONLY agent allowed to handle complex git workflows — stash, pull, branch, merge, rebase, resolve conflicts, push. Writes action log to agent file. |
 | **dependency-auditor** | `subagent` | Audits dependencies for updates and vulnerabilities. Writes to agent file. |
 | **spec-verifier** | `subagent` | Verifies implemented components match Meta-Architect component specs — checks all 4 states, Tailwind classes, accessibility. Writes verdict to agent file. |
@@ -140,7 +140,7 @@ A **Spec-First** system orchestrates multi-agent workflows with zero race condit
     ├── debugger-{desc}.json
     ├── historian.json
     ├── reviewer.json
-    ├── commit-crafter-{desc}.json
+    ├── git-wrangler-{desc}.json
     └── ... (one file per agent per batch)
 ```
 
@@ -184,7 +184,7 @@ The coordinator (`meta-architect-executor`) runs merges at fixed points:
 
 Each agent's table categorizes 20+ task types:
 - **✅ My Job**: what this agent is designed to do (write code, debug, research, review, etc.)
-- **❌ Not My Job → Delegate**: touch git (→ `commit-crafter` or `git-wrangler`), design decisions (→ `design`), review (→ `historian`), etc.
+- **❌ Not My Job → Delegate**: touch git (→ `git-wrangler`), design decisions (→ `design`), review (→ `historian`), etc.
 
 The protocol is codified as a reusable skill at `skills/pre-flight-protocol/SKILL.md`.
 
@@ -192,9 +192,9 @@ The protocol is codified as a reusable skill at `skills/pre-flight-protocol/SKIL
 
 A **HARD RULE** across all 32 agents:
 
-> **Only `commit-crafter` and `git-wrangler` may run git commands. All other agents must delegate git operations.**
+> **Only `git-wrangler` may run git commands. All other agents must delegate git operations.**
 
-Simple commits → `commit-crafter`  
+Simple commits → `git-wrangler`  
 Complex workflows (merge, rebase, push, conflict resolution) → `git-wrangler`
 
 Every non-git agent has this rule prominently stated in its definition. The entry-point orchestrator (`meta-architect-orchestrator`) has `edit: deny` and `bash: deny` — it physically cannot write files or run commands.
@@ -477,7 +477,7 @@ Restart opencode to load the tools.
 Every agent follows this flow:
 1. **Spec-First**: Read `.spec/current.json` before any action
 2. **Pre-Flight**: Classify work vs delegation via the My Job vs Not My Job table
-3. **Git Delegation**: Never touch git — delegate to `commit-crafter` or `git-wrangler`
+3. **Git Delegation**: Never touch git — delegate to `git-wrangler`
 4. **Agent File**: Write results to `.spec/agents/{name}.json` for the coordinator to merge
 
 ### Concurrency Rules

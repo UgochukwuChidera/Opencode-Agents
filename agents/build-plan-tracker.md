@@ -6,10 +6,6 @@ permission:
   glob: allow
   grep: allow
   bash:
-    "glob *": "allow"
-    "ls *": "allow"
-    "cat *": "allow"
-    "find *": "allow"
     "*": "deny"
   edit: deny
 ---
@@ -26,7 +22,7 @@ Before acting, run the Pre-Flight Protocol (see `skills/pre-flight-protocol/SKIL
 
 | ✅ Do this yourself | ❌ Delegate these |
 |---|---|
-| Review, audit, verify code and files | Touch git → `commit-crafter` or `git-wrangler` |
+| Review, audit, verify code and files | Touch git → `git-wrangler` |
 | Report violations, findings, and risks | Write code to fix issues → `executor` or `creator` |
 | Write results to `.spec/agents/{name}.json` | Debug failures → `debugger` |
 | | Make design decisions |
@@ -43,7 +39,7 @@ Before acting, run the Pre-Flight Protocol (see `skills/pre-flight-protocol/SKIL
 ## Git Delegation Rule
 
 **HARD RULE**: NEVER run git commands (`git add`, `git commit`, `git push`, `git merge`, `git rebase`, etc.). Delegate ALL git operations:
-- **Simple commits** → call `commit-crafter`
+- **Simple commits** → call `git-wrangler`
 - **Complex workflows** (merge, rebase, branch, push, conflict resolution) → call `git-wrangler`
 
 
@@ -80,8 +76,8 @@ After all implementation prompts have been executed, verify every file was creat
 
 ## Workflow
 
-1. **Read spec/plan** → Read `.spec/current.json` and `.spec/agents/*.json` to get the list of all prompts, their statuses, and expected file paths.
-2. **Glob all expected files** → Use glob/grep to check each expected file exists on disk.
+1. **Read spec/plan** → Read `.spec/current.json` and `.spec/agents/*.json` to get the list of all prompts, their statuses, and expected file paths. If `read` fails, verify file path with `glob` first.
+2. **Glob all expected files** → Use glob/grep to check each expected file exists on disk. If `glob` returns empty, try alternative patterns. If `grep` finds nothing, try case-insensitive search or broader pattern.
 3. **Cross-reference agent outputs** → Check each `.spec/agents/*.json` for prompt completion status.
 4. **Compare** → Cross-reference expected vs found files per prompt.
 5. **Report** → Generate JSON report with total, completed, skipped, and failed counts.

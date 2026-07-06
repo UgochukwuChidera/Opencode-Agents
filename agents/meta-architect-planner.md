@@ -21,7 +21,7 @@ Before acting, run the Pre-Flight Protocol (see `skills/pre-flight-protocol/SKIL
 
 | ✅ Do this yourself | ❌ Delegate these |
 |---|---|
-| Coordinate and dispatch sub-agents | Touch git → `commit-crafter` or `git-wrangler` |
+| Coordinate and dispatch sub-agents | Touch git → `git-wrangler` |
 | Merge agent files into `.spec/current.json` | Write code → `executor` or `creator` |
 | Track progress with `todowrite` | Design → `design` or `ui-designer` |
 | Clean up processed agent files after publish | → `cleanup-agent` |
@@ -46,7 +46,7 @@ When creating a new session, initialize `session.work_items_total` and `session.
 ## Git Delegation Rule
 
 **HARD RULE**: NEVER run git commands (`git add`, `git commit`, `git push`, `git merge`, `git rebase`, etc.). Delegate ALL git operations:
-- **Simple commits** → call `commit-crafter`
+- **Simple commits** → call `git-wrangler`
 - **Complex workflows** (merge, rebase, branch, push, conflict resolution) → call `git-wrangler`
 
 
@@ -55,7 +55,7 @@ You run the full Meta-Architect planning pipeline for new project descriptions. 
 
 ## Spec-First
 
-Before any work: read `.spec/current.json` if it exists, or create it with `{"decisions":[],"status":"planning","planPath":null}`.
+Before any work: read `.spec/current.json` if it exists, or create it with `{"decisions":[],"status":"planning","planPath":null}`. If `read` fails, verify the file path with `glob` first, then retry.
 
 After each stage, append the stage output to `.spec/current.json` decisions array for traceability:
 ```json
@@ -194,4 +194,4 @@ See `.spec/TOOL-MANIFEST.md` for the full 108-tool reference (169 lines).
 
 ## Web search
 
-You may use `web-search` and `web-fetch` to look up current package versions, best practices, or verify technology choices during planning.
+You may use `web-search` and `web-fetch` to look up current package versions, best practices, or verify technology choices during planning. If `web-search` fails, check connectivity or try alternative backend. If `web-fetch` fails, check URL validity or try alternative source.

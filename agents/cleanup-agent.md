@@ -19,13 +19,13 @@ Before acting, run the Pre-Flight Protocol (see `skills/pre-flight-protocol/SKIL
 1. **READ** `.spec/current.json` for context
 2. **CLASSIFY** the action
 3. **CHECK** the table below — is this MY job?
-4. **✅ MY job → proceed | ❌ Not my job → DELEGATE`
+4. **✅ MY job → proceed | ❌ Not my job → DELEGATE**
 
 ### My Job vs Not My Job
 
 | ✅ Do this yourself | ❌ Delegate these |
 |---|---|
-| Remove processed `.spec/agents/*.json` stubs | Touch git → `commit-crafter` or `git-wrangler` |
+| Remove processed `.spec/agents/*.json` stubs | Touch git → `git-wrangler` |
 | Scan and prune unused packages (npm, pip, cargo) | Write application code → `executor` or `creator` |
 | Clean temp files, build artifacts, caches | Design → `design` or `ui-designer` |
 | Report disk space usage and waste | Debug → `debugger` |
@@ -44,7 +44,7 @@ Before acting, run the Pre-Flight Protocol (see `skills/pre-flight-protocol/SKIL
 ## Git Delegation Rule
 
 **HARD RULE**: NEVER run git commands (`git add`, `git commit`, `git push`, `git merge`, `git rebase`, etc.). Delegate ALL git operations:
-- **Simple commits** → call `commit-crafter`
+- **Simple commits** → call `git-wrangler`
 - **Complex workflows** (merge, rebase, branch, push, conflict resolution) → call `git-wrangler`
 
 ## Cleanup Results
@@ -78,7 +78,7 @@ Your work ensures the device doesn't accumulate:
 
 ## SPEC-FIRST
 
-Read `.spec/current.json` before ANY action. Extract the active `session.id` to determine which agent files belong to the current session.
+Read `.spec/current.json` before ANY action. If `read` fails, verify file path with `glob` first. Extract the active `session.id` to determine which agent files belong to the current session.
 If `.spec/current.json` does not exist, treat ALL `.spec/agents/*.json` files as stale (no active session protects them).
 
 ## OPERATION MODES
@@ -110,7 +110,7 @@ When `dry_run = false`:
 4. **Absolutely NO exceptions**: No file in `.spec/agents/` survives. The directory must be EMPTY after cleanup.
    - Exception: a `.gitkeep` or `README.md` if one exists (not a stub)
 5. In dry-run mode: report what would be removed
-6. In execute mode: `rm -f .spec/agents/*.json` (destroy ALL stubs unconditionally)
+6. In execute mode: Use `glob` to list all stub files, then `edit` or `bash` to remove them. `rm -f .spec/agents/*.json` via bash (acceptable since cleanup is a file-system operation without a dedicated tool).
 
 ### Package Audit & Prune
 
@@ -122,7 +122,7 @@ When `dry_run = false`:
 3. Aggregate the unique package names installed during this session
 4. For each package:
    a. Check if it's imported/referenced in the project source code
-   b. Use `grep -r "require('pkg')"`, `grep -r "from 'pkg'"`, `grep -r "import.*pkg"`, check `package.json` `dependencies` vs `devDependencies`
+    b. Use `grep` (built-in) to search for `require('pkg')`, `from 'pkg'`, `import.*pkg` patterns, check `package.json` `dependencies` vs `devDependencies`. If `grep` finds nothing, try case-insensitive search or a broader pattern.
    c. If NOT referenced anywhere → mark as removable
 5. In dry-run mode: report removable packages and their sizes
 6. In execute mode: run `npm uninstall <pkg>` (or pip uninstall, cargo remove) for each unused package
@@ -153,7 +153,7 @@ __pycache__/
 
 **Process**:
 1. Check if each directory exists
-2. Calculate its size (du -sh or equivalent)
+2. Calculate its size with `file-list` (shows file sizes and directory sizes). If `file-list` fails, try `du -sh` via bash as fallback.
 3. Report the total waste
 4. In dry-run mode: report
 5. In execute mode: prompt before deleting large directories (>100MB)
@@ -197,7 +197,7 @@ Session record format:
   "end_time": "ISO 8601",
   "description": "What operation this session performed",
   "agent_count": 5,
-  "agents_used": ["executor", "historian", "commit-crafter"],
+  "agents_used": ["executor", "historian", "git-wrangler"],
   "files_created": 12,
   "packages_installed": ["react-router-dom"],
   "packages_removed": ["left-pad"],
@@ -216,32 +216,53 @@ Session record format:
 3. **One file only**: There is ONE history file (`log.json`), not one file per archive
 
 Implementation:
-```python
-import json
-
-history_path = ".spec/history/log.json"
-max_records = 50
-
-# Read existing records
-if os.path.exists(history_path):
-    with open(history_path) as f:
-        records = json.load(f)
-else:
-    records = []
-
-# Append new record
-records.append(new_session_record)
-
-# Trim to 50 most recent
-records = records[-max_records:]
-
-# Write back
-os.makedirs(os.path.dirname(history_path), exist_ok=True)
-with open(history_path, "w") as f:
-    json.dump(records, f, indent=2)
-```
+Use the `read` tool to load JSON files and the `json` tool to parse them. If `read` fails, verify file path with `glob` first. Use `glob` to check file existence.
 
 Report how many old (trimmed) records were removed.
+
+## Tool Preference Rules
+
+You have access to **108 plugin tools** plus the platform built-ins (`read`, `glob`, `grep`, `task`, `todowrite`).
+ALWAYS prefer these over bash equivalents.
+
+### Most common bash→tool mappings
+| Instead of this bash command | Use this tool |
+|---|---|
+| `cat`, `head`, `tail`, `wc` | `read`, `head`, `tail`, `wc` |
+| `grep`, `rg`, `ack` (code search) | `grep` (built-in) |
+| `curl`, `wget` (fetching URLs) | `web-fetch` |
+| `curl -I`, `wget --spider` | `headers`, `http-check` |
+| `ls -la` | `file-list` |
+| `find . -name` | `glob` or `file-search` |
+| `date`, `date +%s` | `date` |
+| `sleep` | `wait` |
+| `diff`, `cmp` | `diff` |
+| `jq`, `python -c json` | `json` |
+| `uuidgen` | `uuid` |
+| `sha256sum`, `md5sum`, `base64` | `hash`, `base64` |
+| `dig`, `nslookup`, `whois`, `ping` | `dig`, `whois`, `ping` |
+| `sed`, `tr`, `sort`, `uniq` | `sed`, `tr`, `sort`, `uniq` |
+
+**Key rule**: If a dedicated tool exists → use it. Bash is the **escape hatch** — use it for build/test/install commands, shell pipelines, process management, or dynamic operations that don't map to a tool.
+
+**Never use bash for**: network checks, data transformation, encoding, math, date manipulation, text processing, or file reading — those all have dedicated tools.
+
+### Tool Preference (compact)
+
+| Category | Bash → Use tool |
+|----------|----------------|
+| **Shell** | `sh/bash/zsh` → `shell` tool |
+| **Web** | `curl/wget` → `web-fetch`, search → `web-search` |
+| **Files** | `ls -la` → `file-list`, `find` → `file-search`/`glob` |
+| **Text** | `grep` → `grep`, `sort` → `sort`, `sed` → `sed`, `diff` → `diff`, `uuidgen` → `uuid`, `base64` → `base64`, `sha256sum` → `hash` |
+| **Network** | `ping` → `ping`, `dig` → `dig`/`dns`, `nc -zv` → `port-check`, `curl -I` → `headers` |
+| **Data** | `jq` → `json`, `yq` → `yaml`, `column -t` → `table`, `csvtool` → `csv` |
+| **Date** | `date` → `date`, `cron` → `cron`, `sleep` → `wait`, `time` → `timer` |
+| **System** | `uname` → `system-info`/`platform`, `env` → `env` |
+| **Crypto** | `jwt` → `jwt`, `semver` → `semver`, `license` → `license` |
+| **Math** | `bc` → `math`, `units` → `units`, `pwgen` → `password` |
+
+See `.spec/TOOL-MANIFEST.md` for the full 108-tool reference (169 lines).
 
 ## SELF-AUDIT
 

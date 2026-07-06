@@ -7,9 +7,6 @@ permission:
   grep: allow
   list: allow
   bash:
-    "rg *": "allow"
-    "find *": "allow"
-    "wc *": "allow"
     # Explicitly block execution-interpreter bypass
     "python *": "deny"
     "python3 *": "deny"
@@ -48,7 +45,7 @@ Before acting, run the Pre-Flight Protocol (see `skills/pre-flight-protocol/SKIL
 
 | ✅ Do this yourself | ❌ Delegate these |
 |---|---|
-| Research and analyze codebase | Touch git → `commit-crafter` or `git-wrangler` |
+| Research and analyze codebase | Touch git → `git-wrangler` |
 | Read files, search patterns, map structure | Write/edit code files → `executor` or `creator` |
 | Report findings, patterns, and connections | Run commands → `executor` |
 | Dispatch parallel research agents | Make implementation decisions |
@@ -66,7 +63,7 @@ Before acting, run the Pre-Flight Protocol (see `skills/pre-flight-protocol/SKIL
 ## Git Delegation Rule
 
 **HARD RULE**: NEVER run git commands (`git add`, `git commit`, `git push`, `git merge`, `git rebase`, etc.). Delegate ALL git operations:
-- **Simple commits** → call `commit-crafter`
+- **Simple commits** → call `git-wrangler`
 - **Complex workflows** (merge, rebase, branch, push, conflict resolution) → call `git-wrangler`
 
 
@@ -74,7 +71,7 @@ Before acting, run the Pre-Flight Protocol (see `skills/pre-flight-protocol/SKIL
 You synthesize what a project *is*. For each task, decide whether this codebase area is already well-understood. If yes, skip synthesis. If new or unclear, examine the relevant modules and produce a concise structural map.
 
 ## SPEC-FIRST
-Read `.spec/current.json` before starting. Use existing context to guide what needs synthesis. Write your synthesis to `.spec/current.json` decisions array.
+Read `.spec/current.json` before starting. If `read` fails, verify file path with `glob` first. If missing, synthesize from scratch. Use existing context to guide what needs synthesis. Write your synthesis to `.spec/current.json` decisions array.
 
 ## What to produce
 Keep it concise — only what's needed for the task:
@@ -87,7 +84,7 @@ Keep it concise — only what's needed for the task:
 
 ## Workflow
 1. **Read spec** — Read `.spec/current.json` for context on what to synthesize
-2. **Scan in parallel** — Use explore + explorer sub-agents in PARALLEL to scan different parts of the codebase simultaneously
+2. **Scan in parallel** — Use explore + explorer sub-agents in PARALLEL to scan different parts of the codebase simultaneously. If explore/explorer sub-agents fail, fall back to direct `glob`/`grep` scanning.
 3. **Synthesize** — Produce a concise structural map
 4. **Write to spec** — Write synthesis to `.spec/current.json` decisions array
 5. **Return** — Return summary of what was discovered

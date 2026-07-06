@@ -1,0 +1,184 @@
+{
+  "scan_batch": 5,
+  "files_scanned": [
+    "debugger.md",
+    "creator.md",
+    "commit-crafter.md",
+    "cleanup-agent.md",
+    "build-plan-tracker.md",
+    "architect.md",
+    "adr-enforcer.md"
+  ],
+  "findings": [
+    {
+      "file": "/home/carapace/code/Opencode-Agents/agents/debugger.md",
+      "line": 93,
+      "pattern_type": 3,
+      "pattern_name": "No error recovery for tool calls",
+      "exact_text": "3. **Trace backward** — check imports, dependencies, types, and calling code",
+      "issue": "Implicitly uses `grep` (to search for imports, dependencies, types) but provides no recovery pattern if `grep` finds nothing (e.g., \"Try case-insensitive search or broader pattern\").",
+      "recommendation": "Add fallback: \"If `grep` finds nothing, try case-insensitive search or a broader pattern.\""
+    },
+    {
+      "file": "/home/carapace/code/Opencode-Agents/agents/debugger.md",
+      "line": 180,
+      "pattern_type": 3,
+      "pattern_name": "No error recovery for tool calls",
+      "exact_text": "- Search the web for unfamiliar error messages",
+      "issue": "Implicitly uses `web-search` but provides no recovery pattern if the search returns no results or fails.",
+      "recommendation": "Add fallback: \"If `web-search` returns no results, try rephrasing the query or checking the error message for typos.\""
+    },
+    {
+      "file": "/home/carapace/code/Opencode-Agents/agents/debugger.md",
+      "line": 175,
+      "pattern_type": 3,
+      "pattern_name": "No error recovery for tool calls",
+      "exact_text": "- Run relevant commands (npx tsc --noEmit, npx vitest run, npm run build) to verify the error and the fix.",
+      "issue": "Instructs running build/test commands via bash but provides no recovery if the command fails (e.g., what to do if npx is not installed or the build fails unexpectedly). Build/test commands are legitimate bash usage, but error recovery instructions are missing.",
+      "recommendation": "Add fallback: \"If the command fails with a 'command not found' error, check that the package manager and dependencies are installed. If the build fails, read the error output and re-enter the investigation loop.\""
+    },
+    {
+      "file": "/home/carapace/code/Opencode-Agents/agents/creator.md",
+      "line": 92,
+      "pattern_type": 0,
+      "pattern_name": "NO ISSUES",
+      "exact_text": "2. **Understand context** — use `read`/`glob`/`grep` to understand the codebase and existing patterns. If `read` fails, verify file path with `glob` first. If `glob` returns empty, try alternative patterns or check the directory exists with `file-list`. If `grep` finds nothing, try case-insensitive search or a broader pattern.",
+      "issue": "This file is fully compliant. All three tools (read, glob, grep) have proper recovery patterns. Tool-preference section and pre-flight protocol are both present.",
+      "recommendation": "No changes needed."
+    },
+    {
+      "file": "/home/carapace/code/Opencode-Agents/agents/commit-crafter.md",
+      "line": 78,
+      "pattern_type": 0,
+      "pattern_name": "NO ISSUES",
+      "exact_text": "2. **Read the diff** — use `bash` and `git diff` to see what changed, use `read` to examine file contents. If `read` fails, verify file path with `glob` first.",
+      "issue": "This file is fully compliant. The `read` fallback is present, tool-preference section and pre-flight protocol are both present. Git commands via bash are legitimate since no git plugin tool exists.",
+      "recommendation": "No changes needed."
+    },
+    {
+      "file": "/home/carapace/code/Opencode-Agents/agents/cleanup-agent.md",
+      "line": 22,
+      "pattern_type": 4,
+      "pattern_name": "Markdown formatting bug in pre-flight protocol",
+      "exact_text": "4. **✅ MY job → proceed | ❌ Not my job → DELEGATE`",
+      "issue": "The closing bold `**` is missing. The line has `DELEGATE`` (backtick) instead of `DELEGATE**`. This is a formatting error in the pre-flight protocol section that breaks the Markdown rendering (bold not closed, code span unclosed).",
+      "recommendation": "Change `DELEGATE`` to `DELEGATE**`"
+    },
+    {
+      "file": "/home/carapace/code/Opencode-Agents/agents/cleanup-agent.md",
+      "line": 113,
+      "pattern_type": 1,
+      "pattern_name": "Suggesting bash where tools exist",
+      "exact_text": "6. In execute mode: `rm -f .spec/agents/*.json` (destroy ALL stubs unconditionally)",
+      "issue": "Instructs using bash `rm` command to delete files. While no dedicated 'delete file' plugin tool is available, this could be delegated to an agent with file management capabilities, or the operation could use the `file-list` + `edit` combination to verify before removing. Consider whether a safer alternative exists.",
+      "recommendation": "If no plugin delete tool is available, this is acceptable bash usage. No change strictly required."
+    },
+    {
+      "file": "/home/carapace/code/Opencode-Agents/agents/cleanup-agent.md",
+      "line": 122,
+      "pattern_type": 3,
+      "pattern_name": "No error recovery for tool calls",
+      "exact_text": "b. Use `grep` (built-in) to search for `require('pkg')`, `from 'pkg'`, `import.*pkg` patterns, check `package.json` `dependencies` vs `devDependencies`",
+      "issue": "Uses `grep` to search for package references but provides no recovery pattern if `grep` finds nothing. Agent should be told to try case-insensitive search or broader pattern if the initial grep returns empty.",
+      "recommendation": "Add fallback: \"If `grep` finds nothing, try case-insensitive search or a broader pattern (e.g., search for just the package name without quotes).\""
+    },
+    {
+      "file": "/home/carapace/code/Opencode-Agents/agents/cleanup-agent.md",
+      "line": 156,
+      "pattern_type": 3,
+      "pattern_name": "No error recovery for tool calls",
+      "exact_text": "2. Calculate its size with `file-list` (shows file sizes and directory sizes)",
+      "issue": "Uses `file-list` to calculate directory sizes but provides no recovery pattern if `file-list` fails (e.g., directory doesn't exist, permission denied).",
+      "recommendation": "Add fallback: \"If `file-list` fails, verify the directory exists with `glob` first, or check permissions.\""
+    },
+    {
+      "file": "/home/carapace/code/Opencode-Agents/agents/build-plan-tracker.md",
+      "line": 79,
+      "pattern_type": 2,
+      "pattern_name": "Missing tool fallback instructions",
+      "exact_text": "1. **Read spec/plan** → Read `.spec/current.json` and `.spec/agents/*.json` to get the list of all prompts, their statuses, and expected file paths.",
+      "issue": "Instructs to 'Read' spec files without specifying the `read` tool or providing the fallback: 'If `read` fails, verify file path with `glob` first.' The word 'Read' (capital R) implies using the `read` tool but lacks the standard fallback clause.",
+      "recommendation": "Add: \"If `read` fails, verify the file path with `glob` first.\""
+    },
+    {
+      "file": "/home/carapace/code/Opencode-Agents/agents/build-plan-tracker.md",
+      "line": 79,
+      "pattern_type": 3,
+      "pattern_name": "No error recovery for tool calls",
+      "exact_text": "1. **Read spec/plan** → Read `.spec/current.json` and `.spec/agents/*.json` to get the list of all prompts, their statuses, and expected file paths.",
+      "issue": "Uses `read` tool implicitly but provides no recovery pattern if the read fails. The file has recovery for `glob` (line 80) and `grep` (line 80) but the initial `read` instruction (line 79) lacks recovery.",
+      "recommendation": "Add: \"If `read` fails, verify file path with `glob` first.\""
+    },
+    {
+      "file": "/home/carapace/code/Opencode-Agents/agents/architect.md",
+      "line": 49,
+      "pattern_type": 4,
+      "pattern_name": "Markdown formatting bug in pre-flight protocol",
+      "exact_text": "4. **✅ MY job → proceed | ❌ Not my job → DELEGATE`",
+      "issue": "The closing bold `**` is missing. The line has `DELEGATE`` (backtick) instead of `DELEGATE**`. This breaks the Markdown rendering (bold not closed, code span unclosed).",
+      "recommendation": "Change `DELEGATE`` to `DELEGATE**`"
+    },
+    {
+      "file": "/home/carapace/code/Opencode-Agents/agents/adr-enforcer.md",
+      "line": 117,
+      "pattern_type": 2,
+      "pattern_name": "Missing tool fallback instructions",
+      "exact_text": "### 1. Read ADRs from Spec and docs/adrs/\nLoad `.spec/current.json` and scan `docs/adrs/*.md` to extract all ADRs that need enforcement.",
+      "issue": "Instructs loading/reading `.spec/current.json` using the `read` tool but does not include the standard fallback: 'If `read` fails, verify the file path with `glob` first.'",
+      "recommendation": "Add: \"If `read` fails, verify the file path with `glob` first.\""
+    },
+    {
+      "file": "/home/carapace/code/Opencode-Agents/agents/adr-enforcer.md",
+      "line": 117,
+      "pattern_type": 3,
+      "pattern_name": "No error recovery for tool calls",
+      "exact_text": "### 1. Read ADRs from Spec and docs/adrs/\nLoad `.spec/current.json` and scan `docs/adrs/*.md` to extract all ADRs that need enforcement.",
+      "issue": "Uses `read` tool to load `.spec/current.json` with no recovery pattern if the read fails. Line 122 has recovery for glob/grep, but line 117's read instruction lacks it.",
+      "recommendation": "Add: \"If `read` fails, verify file path with `glob` first.\""
+    }
+  ],
+  "summary": {
+    "files_with_issues": 5,
+    "files_clean": 2,
+    "total_findings": 13,
+    "by_pattern": {
+      "pattern_1_bash_instead_of_tools": 1,
+      "pattern_2_missing_fallback": 2,
+      "pattern_3_no_error_recovery": 5,
+      "pattern_4_preflight_formatting": 2,
+      "pattern_5_missing_preflight": 0
+    },
+    "by_file": {
+      "debugger.md": {
+        "issues": 3,
+        "patterns": [3]
+      },
+      "creator.md": {
+        "issues": 0,
+        "patterns": [],
+        "note": "Fully compliant — has all fallbacks, tool-preference, and pre-flight"
+      },
+      "commit-crafter.md": {
+        "issues": 0,
+        "patterns": [],
+        "note": "Fully compliant — has all fallbacks, tool-preference, and pre-flight"
+      },
+      "cleanup-agent.md": {
+        "issues": 4,
+        "patterns": [1, 3, 4]
+      },
+      "build-plan-tracker.md": {
+        "issues": 2,
+        "patterns": [2, 3]
+      },
+      "architect.md": {
+        "issues": 1,
+        "patterns": [4]
+      },
+      "adr-enforcer.md": {
+        "issues": 2,
+        "patterns": [2, 3]
+      }
+    }
+  }
+}

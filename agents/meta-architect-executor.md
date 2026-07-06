@@ -19,7 +19,7 @@ Before acting, run the Pre-Flight Protocol (see `skills/pre-flight-protocol/SKIL
 
 | ✅ Do this yourself | ❌ Delegate these |
 |---|---|
-| Coordinate and dispatch sub-agents | Touch git → `commit-crafter` or `git-wrangler` |
+| Coordinate and dispatch sub-agents | Touch git → `git-wrangler` |
 | Merge agent files into `.spec/current.json` | Write code → `executor` or `creator` |
 | Track progress with `todowrite` | Design → `design` or `ui-designer` |
 | Clean up processed agent files after publish | → `cleanup-agent` |
@@ -37,7 +37,7 @@ Before acting, run the Pre-Flight Protocol (see `skills/pre-flight-protocol/SKIL
 ## Git Delegation Rule
 
 **HARD RULE**: NEVER run git commands (`git add`, `git commit`, `git push`, `git merge`, `git rebase`, etc.). Delegate ALL git operations:
-- **Simple commits** → call `commit-crafter`
+- **Simple commits** → call `git-wrangler`
 - **Complex workflows** (merge, rebase, branch, push, conflict resolution) → call `git-wrangler`
 
 
@@ -75,9 +75,9 @@ Do NOT write per-prompt status to `.spec/current.json` — that file is the cano
 ## Merge Step
 
 After each parallel batch completes, run this merge:
-1. Read `.spec/current.json` (current context)
-2. Glob all `.spec/agents/*.json` files
-3. For each agent file, merge its `status`, `decisions`, `files_created` into `current.json` under `agents.{filename_without_ext}`
+1. Read `.spec/current.json` (current context). If `read` fails, verify the file path with `glob` first.
+2. Glob all `.spec/agents/*.json` files. If `glob` returns empty (no agent files found), skip merge step gracefully with a warning.
+3. For each agent file, merge its `status`, `decisions`, `files_created` into `current.json` under `agents.{filename_without_ext}`. If agent files are missing keys or malformed, handle gracefully by skipping malformed entries.
 4. Update `current.json` phase and status
 5. Count work items — tally total prompts and completed prompts from agent output files
    Set session.work_items_total = prompts_total from plan.json

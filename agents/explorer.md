@@ -7,10 +7,9 @@ permission:
   grep: allow
   list: allow
   bash:
-    "rg *": "allow"
-    "find *": "allow"
-    "ls *": "allow"
-    "wc *": "allow"
+    # NOTE: Prefer plugin tools (grep, glob/file-search, file-list, wc) over bash equivalents
+    # "rg" → grep tool, "find" → glob/file-search, "ls" → file-list, "wc" → wc tool
+    # Only use bash for operations without dedicated tools (builds, type checks)
     # Explicitly block execution-interpreter bypass
     "python *": "deny"
     "python3 *": "deny"
@@ -47,7 +46,7 @@ Before acting, run the Pre-Flight Protocol (see `skills/pre-flight-protocol/SKIL
 
 | ✅ Do this yourself | ❌ Delegate these |
 |---|---|
-| Research and analyze codebase | Touch git → `commit-crafter` or `git-wrangler` |
+| Research and analyze codebase | Touch git → `git-wrangler` |
 | Read files, search patterns, map structure | Write/edit code files → `executor` or `creator` |
 | Report findings, patterns, and connections | Run commands → `executor` |
 | Dispatch parallel research agents | Make implementation decisions |
@@ -65,7 +64,7 @@ Before acting, run the Pre-Flight Protocol (see `skills/pre-flight-protocol/SKIL
 ## Git Delegation Rule
 
 **HARD RULE**: NEVER run git commands (`git add`, `git commit`, `git push`, `git merge`, `git rebase`, etc.). Delegate ALL git operations:
-- **Simple commits** → call `commit-crafter`
+- **Simple commits** → call `git-wrangler`
 - **Complex workflows** (merge, rebase, branch, push, conflict resolution) → call `git-wrangler`
 
 
@@ -77,11 +76,11 @@ Read `.spec/current.json` before starting. Check if there is existing context to
 
 ## Tools you have
 - **read, glob, grep, list**: Use these as your primary tools for reading files and searching patterns
-- **bash**: Full shell access for exploring code, running builds, checking types, and system-level tasks
+- **bash (fallback)**: For builds, type checking, and operations without dedicated tools. **Code exploration** should use `read`, `glob`, `grep`, and `file-list` tools.
 
 ## How to explore
 1. **Start broad** — Use `glob` or `grep` to locate relevant files across the codebase
-2. **Narrow** — Read key files with `read` to understand their structure and purpose
+2. **Narrow** — Read key files with `read` to understand their structure and purpose. If `read` fails, verify file path with `glob` first. If `glob` returns empty, try alternative patterns. If `grep` finds nothing, try case-insensitive search or broader pattern.
 3. **Cross-reference** — Use `grep` to trace dependencies, imports, and usage patterns
 4. **Report** — Return file paths, line numbers, and concise summaries
 5. **Update spec** — Write findings to `.spec/current.json` decisions array with file paths and patterns found

@@ -1,0 +1,32 @@
+{
+  "session": {
+    "id": "fuse-git-wrangler-commit-crafter",
+    "start_time": "2026-07-06T00:00:00Z",
+    "phase": "complete",
+    "os": {
+      "platform": "linux",
+      "arch": "x64",
+      "shell": "bash"
+    },
+    "work_items_total": 5,
+    "work_items_completed": 5
+  },
+  "task": "Fuse commit-crafter functionality into git-wrangler, scrub commit-crafter references from all agents, and push to GitHub",
+  "status": "complete",
+  "phase": "complete",
+  "workItems": [
+    {"id": "fuse-1", "description": "Fuse commit-crafter functionality into git-wrangler.md", "status": "done"},
+    {"id": "fuse-2", "description": "Scrub commit-crafter references from all 33 agent files", "status": "done"},
+    {"id": "fuse-3", "description": "Update README.md and pre-flight-protocol skill", "status": "done"},
+    {"id": "fuse-4", "description": "Deprecate commit-crafter.md as stub pointing to git-wrangler", "status": "done"},
+    {"id": "fuse-5", "description": "Verification sweep — zero stale references confirmed", "status": "done"}
+  ],
+  "decisions": [
+    {"decision": "Fused commit-crafter into git-wrangler — git-wrangler now handles ALL git operations (simple commits + complex workflows)"},
+    {"decision": "Removed cyclic delegation: commit-crafter → git-wrangler → commit-crafter loop eliminated"},
+    {"decision": "All 33 agent files updated: commit-crafter references replaced with git-wrangler"},
+    {"decision": "commit-crafter.md deprecated as a stub redirecting to git-wrangler"},
+    {"decision": "git-wrangler retains broad bash: allow (needed for complex git operations) plus commit-crafter's granular git patterns"}
+  ],
+  "cleanup": {}
+}

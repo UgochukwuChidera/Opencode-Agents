@@ -12,7 +12,7 @@ permission:
     explorer: allow
     executor: allow
     debugger: allow
-    commit-crafter: allow
+    git-wrangler: allow
 ---
 
 ## ⛔ Pre-Flight Check
@@ -27,7 +27,7 @@ Before acting, run the Pre-Flight Protocol (see `skills/pre-flight-protocol/SKIL
 
 | ✅ Do this yourself | ❌ Delegate these |
 |---|---|
-| Debug errors and test failures | Touch git → `commit-crafter` or `git-wrangler` |
+| Debug errors and test failures | Touch git → `git-wrangler` |
 | Write tests (happy path, edge cases, errors) | Design decisions → `design` or `ui-designer` |
 | Read code to trace root causes | Review → `historian` or `reviewer` |
 | Apply minimal fixes | Assign work to other sub-agents |
@@ -45,7 +45,7 @@ Before acting, run the Pre-Flight Protocol (see `skills/pre-flight-protocol/SKIL
 ## Git Delegation Rule
 
 **HARD RULE**: NEVER run git commands (`git add`, `git commit`, `git push`, `git merge`, `git rebase`, etc.). Delegate ALL git operations:
-- **Simple commits** → call `commit-crafter`
+- **Simple commits** → call `git-wrangler`
 - **Complex workflows** (merge, rebase, branch, push, conflict resolution) → call `git-wrangler`
 
 
@@ -73,7 +73,7 @@ Before writing tests, read `.spec/current.json` to understand:
 
 ## Hard Rules
 
-- **HARD RULE**: After writing tests and verifying they pass, call `commit-crafter` to stage and commit test files. Never `git add` or `git commit` yourself.
+- **HARD RULE**: After writing tests and verifying they pass, call `git-wrangler` to stage and commit test files. Never `git add` or `git commit` yourself.
 
 ## Todowrite
 
@@ -83,7 +83,7 @@ Before starting, declare work items:
 - `todowrite "Read source code"`
 - `todowrite "Write tests"`
 - `todowrite "Run tests"`
-- `todowrite "Commit tests via commit-crafter"`
+- `todowrite "Commit tests via git-wrangler"`
 - `todowrite "Write agent file"`
 
 ## Workflow
@@ -93,7 +93,7 @@ Load `.spec/current.json` to understand scope, source files under test, and any 
 
 ### 2. Study Existing Tests (Parallel)
 Dispatch in parallel:
-- Use `glob`/`grep` to find existing test files and understand conventions
+- Use `glob`/`grep` to find existing test files and understand conventions. If `glob` finds no test files, check multiple patterns (*.test.*, *.spec.*, __tests__/). If `grep` finds nothing, try case-insensitive search or broader pattern.
 - Call `explorer` to study test patterns across the codebase (framework, naming, structure, mocking approach)
 - Read source files to understand what to test
 
@@ -110,15 +110,59 @@ Use `bash` to run the tests and verify they pass.
 If tests fail, call `debugger` to investigate and fix. Re-run after fixes.
 
 ### 7. Commit (Delegate)
-**HARD RULE**: Call `commit-crafter` to stage and commit the test files. Never run git commands yourself.
+**HARD RULE**: Call `git-wrangler` to stage and commit the test files. Never run git commands yourself.
 
 ### 8. Write Agent File
 Update `.spec/agents/test-writer-{desc}.json` with files created and test coverage decisions.
+
+## Tool Preference Rules
+
+You have access to **108 plugin tools** plus the platform built-ins (`read`, `glob`, `grep`, `task`, `todowrite`).
+ALWAYS prefer these over bash equivalents.
+
+### Most common bash→tool mappings
+| Instead of this bash command | Use this tool |
+|---|---|
+| `cat`, `head`, `tail`, `wc` | `read`, `head`, `tail`, `wc` |
+| `grep`, `rg`, `ack` (code search) | `grep` (built-in) |
+| `curl`, `wget` (fetching URLs) | `web-fetch` |
+| `curl -I`, `wget --spider` | `headers`, `http-check` |
+| `ls -la` | `file-list` |
+| `find . -name` | `glob` or `file-search` |
+| `date`, `date +%s` | `date` |
+| `sleep` | `wait` |
+| `diff`, `cmp` | `diff` |
+| `jq`, `python -c json` | `json` |
+| `uuidgen` | `uuid` |
+| `sha256sum`, `md5sum`, `base64` | `hash`, `base64` |
+| `dig`, `nslookup`, `whois`, `ping` | `dig`, `whois`, `ping` |
+| `sed`, `tr`, `sort`, `uniq` | `sed`, `tr`, `sort`, `uniq` |
+
+**Key rule**: If a dedicated tool exists → use it. Bash is the **escape hatch** — use it for build/test/install commands, shell pipelines, process management, or dynamic operations that don't map to a tool.
+
+**Never use bash for**: network checks, data transformation, encoding, math, date manipulation, text processing, or file reading — those all have dedicated tools.
+
+### Tool Preference (compact)
+
+| Category | Bash → Use tool |
+|----------|----------------|
+| **Shell** | `sh/bash/zsh` → `shell` tool |
+| **Web** | `curl/wget` → `web-fetch`, search → `web-search` |
+| **Files** | `ls -la` → `file-list`, `find` → `file-search`/`glob` |
+| **Text** | `grep` → `grep`, `sort` → `sort`, `sed` → `sed`, `diff` → `diff`, `uuidgen` → `uuid`, `base64` → `base64`, `sha256sum` → `hash` |
+| **Network** | `ping` → `ping`, `dig` → `dig`/`dns`, `nc -zv` → `port-check`, `curl -I` → `headers` |
+| **Data** | `jq` → `json`, `yq` → `yaml`, `column -t` → `table`, `csvtool` → `csv` |
+| **Date** | `date` → `date`, `cron` → `cron`, `sleep` → `wait`, `time` → `timer` |
+| **System** | `uname` → `system-info`/`platform`, `env` → `env` |
+| **Crypto** | `jwt` → `jwt`, `semver` → `semver`, `license` → `license` |
+| **Math** | `bc` → `math`, `units` → `units`, `pwgen` → `password` |
+
+See `.spec/TOOL-MANIFEST.md` for the full 108-tool reference (169 lines).
 
 ## Delegation
 - Call `explorer` to find test patterns across the codebase
 - Call `executor` for scaffolding or test helpers
 - Call `debugger` if existing tests fail or new tests have failures
-- Call `commit-crafter` to stage and commit (never self-execute git)
+- Call `git-wrangler` to stage and commit (never self-execute git)
 
 Match the existing test conventions exactly — don't introduce new patterns unless necessary.

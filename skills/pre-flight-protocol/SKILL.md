@@ -58,7 +58,7 @@ Before any agent takes an action, it MUST run a pre-flight check to validate tha
 
 | ✅ MY Job (do it yourself) | ❌ NOT my Job (delegate) |
 |---|---|
-| Accept work from the orchestrator | Touch git — delegate to `commit-crafter` or `git-wrangler` |
+| Accept work from the orchestrator | Touch git — delegate to `git-wrangler` |
 | Read `.spec/current.json` for context | Assign work to other agents |
 | Read/write files as instructed | Make design decisions (unless you ARE design) |
 | Run commands as instructed | Change scope without asking the orchestrator |
