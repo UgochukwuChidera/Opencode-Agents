@@ -22,7 +22,8 @@ echo ==^> Config dir: %OPENCODE_CONFIG_DIR%
 :: Ensure the parent config directory exists
 if not exist "%OPENCODE_CONFIG_DIR%" mkdir "%OPENCODE_CONFIG_DIR%"
 
-:: ── Utility: create junction ─────────────────────────────────────
+:: ── Utility: create junction (subroutine, called below) ──────────
+goto :do_links
 :link_dir
 set "TARGET=%~1"
 set "LINK=%~2"
@@ -32,8 +33,14 @@ if exist "!LINK!" (
   rmdir /s /q "!LINK!"
 )
 mklink /J "!LINK!" "!TARGET!" >nul
-echo   ✅ !NAME! linked: !LINK! -^> !TARGET!
+if !errorlevel! equ 0 (
+  echo   ✅ !NAME! linked: !LINK! -^> !TARGET!
+) else (
+  echo   ❌ Failed to link !NAME!
+)
 goto :eof
+
+:do_links
 
 :: ── Link Agents ──────────────────────────────────────────────────
 call :link_dir "%AGENTS_TARGET%" "%OPENCODE_AGENTS_DIR%" "Agents"
