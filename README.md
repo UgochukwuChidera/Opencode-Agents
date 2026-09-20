@@ -108,21 +108,21 @@ Every research agent also has a `## HARD RULE: NO CODE EXECUTION` section in its
 
 Skills are specialized Markdown instruction files that get loaded into the LLM's context when a task matches their trigger keywords.
 
-| Skill                            | Description                                                                                                                                                                                        |
-| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **react-patterns**               | React component composition, hooks patterns, state management                                                                                                                                      |
-| **error-handling**               | Go/Rust/TS/Python error patterns, structured logging, retry strategies                                                                                                                             |
-| **api-design**                   | RESTful URL conventions, HTTP methods, pagination, OpenAPI docs                                                                                                                                    |
-| **testing-strategy**             | Test pyramid, mocking rules, coverage targets, CI integration                                                                                                                                      |
-| **security-review**              | OWASP Top 10, XSS, CSRF, auth patterns, secure defaults                                                                                                                                            |
-| **design-system-implementation** | UI components from design token specs, Tailwind, 4 states rule                                                                                                                                     |
-| **meta-architect-patterns**      | Meta-Architect build plan execution, ADR enforcement, agent file protocol                                                                                                                          |
-| **segmented-prompt-execution**   | One-prompt-at-a-time execution from build plans, agent file integration                                                                                                                            |
-| **pre-flight-protocol**          | ⛔ Mandatory pre-flight check: READ → CLASSIFY → CHECK My Job vs Not My Job → STOP/GO → TRACK → LOG. Reusable across all agents.                                                                   |
-| **database-data-layer**          | Prisma ORM, raw SQL, migrations, seed data, connection pooling, query optimization                                                                                                                 |
-| **authentication-authorization** | JWT, OAuth, sessions, RBAC, MFA, password hashing, security headers                                                                                                                                |
-| **deployment-devops**            | Docker, docker-compose, CI/CD (GitHub Actions), Railway, Fly.io, Vercel, environment config                                                                                                        |
-| **flow-refactor-blueprint**      | Decision-first refactor of bottlenecked user flows: DFDs + step-cost trace, root-mechanism fixes (e.g. server actions), redirect/error primitives, middleware hardening, dedup, verify-before-ship |
+| Skill                            | Description                                                                                                                                                                                    |
+| -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **react-patterns**               | React component composition, hooks patterns, state management                                                                                                                                  |
+| **error-handling**               | Go/Rust/TS/Python error patterns, structured logging, retry strategies                                                                                                                         |
+| **api-design**                   | RESTful URL conventions, HTTP methods, pagination, OpenAPI docs                                                                                                                                |
+| **testing-strategy**             | Test pyramid, mocking rules, coverage targets, CI integration                                                                                                                                  |
+| **security-review**              | OWASP Top 10, XSS, CSRF, auth patterns, secure defaults                                                                                                                                        |
+| **design-system-implementation** | UI components from design token specs, Tailwind, 4 states rule                                                                                                                                 |
+| **meta-architect-patterns**      | Meta-Architect build plan execution, ADR enforcement, agent file protocol                                                                                                                      |
+| **segmented-prompt-execution**   | One-prompt-at-a-time execution from build plans, agent file integration                                                                                                                        |
+| **pre-flight-protocol**          | ⛔ Mandatory pre-flight check: READ → CLASSIFY → CHECK My Job vs Not My Job → STOP/GO → TRACK → LOG. Reusable across all agents.                                                               |
+| **database-data-layer**          | Prisma ORM, raw SQL, migrations, seed data, connection pooling, query optimization                                                                                                             |
+| **authentication-authorization** | JWT, OAuth, sessions, RBAC, MFA, password hashing, security headers                                                                                                                            |
+| **deployment-devops**            | Docker, docker-compose, CI/CD (GitHub Actions), Railway, Fly.io, Vercel, environment config                                                                                                    |
+| **flow-refactor-blueprint**      | Decision-first refactor of any bottlenecked user flow (auth, checkout, onboarding): DFDs + step-cost trace, root-mechanism fixes, shared primitives, edge hardening, dedup, verify-before-ship |
 
 ## `.spec/` State Management & Concurrency Protocol
 
